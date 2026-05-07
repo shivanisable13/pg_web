@@ -1,4 +1,5 @@
 pipeline {
+
     agent any
 
     environment {
@@ -10,164 +11,256 @@ pipeline {
     options {
         timestamps()
         buildDiscarder(logRotator(numToKeepStr: '5'))
-        timeout(time: 20, unit: 'MINUTES')
+        timeout(time: 30, unit: 'MINUTES')
     }
 
     stages {
 
+        // ==========================================
+        // CHECKOUT SOURCE CODE
+        // ==========================================
         stage('Checkout') {
             steps {
-                echo 'Cloning source code...'
+                echo 'Cloning GitHub repository...'
+
                 checkout scm
+
                 sh 'ls -la'
             }
         }
 
+        // ==========================================
+        // PHP SYNTAX CHECK
+        // ==========================================
         stage('PHP Syntax Check') {
             steps {
                 echo 'Checking PHP syntax...'
-                // Use locally cached php image, grep for errors only - exit 0 always so pipeline continues
+
                 sh '''
-                    docker run --rm -v "$PWD":/app -w /app php:8.2-cli \
-                        sh -c "find . -name '*.php' ! -path './vendor/*' -exec php -l {} \\; 2>&1" \
-                        | grep -E "Parse error|Fatal error" && echo "SYNTAX ERRORS FOUND" || echo "PHP syntax check passed!"
+                    docker run --rm \
+                    -v "$PWD":/app \
+                    -w /app \
+                    php:8.2-cli \
+                    sh -c "find . -name '*.php' ! -path './vendor/*' -exec php -l {} \\;"
                 '''
             }
         }
 
+        // ==========================================
+        // SECURITY CHECK
+        // ==========================================
         stage('Security Scan') {
             steps {
-                echo 'Running security checks...'
-                sh 'grep -rn "SMTP_PASS" includes/config/config.php && echo "WARNING: Credentials in config.php" || echo "Security scan done."'
+                echo 'Running security scan...'
+
+                sh '''
+                    grep -rn "SMTP_PASS" includes/config/config.php \
+                    && echo "WARNING: Credentials detected in config.php" \
+                    || echo "Security scan completed."
+                '''
             }
         }
 
+        // ==========================================
+        // BUILD DOCKER IMAGE
+        // ==========================================
         stage('Docker Build') {
             steps {
-                echo "Building Docker image: ${DOCKER_IMAGE}:${DOCKER_TAG}"
-                sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -t ${DOCKER_IMAGE}:latest ."
-                sh "docker images | grep ${DOCKER_IMAGE} || true"
+
+                echo "Building Docker image..."
+
+                sh """
+                    docker build \
+                    -t ${DOCKER_IMAGE}:${DOCKER_TAG} \
+                    -t ${DOCKER_IMAGE}:latest .
+                """
+
+                sh 'docker images | grep campusstay-app || true'
             }
         }
 
+        // ==========================================
+        // DEPLOY APPLICATION
+        // ==========================================
         stage('Deploy') {
             steps {
-                echo 'Deploying CampusStay...'
+
+                echo 'Deploying CampusStay application...'
+
                 sh '''
-                    echo "=== Stopping and removing old containers ==="
-                    # Force stop and remove by name (ignore errors)
-                    docker stop campusstay_app 2>/dev/null || true
-                    docker stop campusstay_db  2>/dev/null || true
-                    docker rm -f campusstay_app 2>/dev/null || true
-                    docker rm -f campusstay_db  2>/dev/null || true
+                    echo "======================================"
+                    echo "STOPPING OLD CONTAINERS"
+                    echo "======================================"
 
-                    # Also kill any container using port 8080 or 3307
-                    USING_9090=$(docker ps -q --filter publish=9090 2>/dev/null)
-                    if [ -n "$USING_9090" ]; then
-                        echo "Stopping container using port 9090..."
-                        docker stop $USING_9090 2>/dev/null || true
-                        docker rm -f $USING_9090 2>/dev/null || true
-                    fi
+                    docker stop campusstay_app || true
+                    docker stop campusstay_db || true
 
-                    USING_3307=$(docker ps -q --filter publish=3307 2>/dev/null)
-                    if [ -n "$USING_3307" ]; then
-                        echo "Stopping container using port 3307..."
-                        docker stop $USING_3307 2>/dev/null || true
-                        docker rm -f $USING_3307 2>/dev/null || true
-                    fi
+                    docker rm -f campusstay_app || true
+                    docker rm -f campusstay_db || true
 
-                    echo "=== Recreating network ==="
-                    docker network rm campusstay_network 2>/dev/null || true
+                    echo "======================================"
+                    echo "REMOVING OLD NETWORK"
+                    echo "======================================"
+
+                    docker network rm campusstay_network || true
+
                     sleep 2
+
                     docker network create campusstay_network
 
-                    echo "=== Starting MySQL ==="
+                    echo "======================================"
+                    echo "CREATING MYSQL VOLUME"
+                    echo "======================================"
+
+                    docker volume create campusstay_mysql_data || true
+
+                    echo "======================================"
+                    echo "STARTING MYSQL CONTAINER"
+                    echo "======================================"
+
                     docker run -d \
                         --name campusstay_db \
                         --network campusstay_network \
-                        -e MYSQL_DATABASE=campus_stay \
+                        -e MYSQL_DATABASE=campusstay \
                         -e MYSQL_USER=campusstay_user \
                         -e MYSQL_PASSWORD=CampusStay2024 \
                         -e MYSQL_ROOT_PASSWORD=RootPass2024 \
                         -p 3307:3306 \
+                        -v campusstay_mysql_data:/var/lib/mysql \
                         mysql:8.0
 
-                    echo "Waiting 25s for MySQL to initialize..."
-                    sleep 25
+                    echo "Waiting for MySQL to initialize..."
+                    sleep 35
 
-                    echo "=== Starting PHP App ==="
+                    echo "======================================"
+                    echo "STARTING PHP APPLICATION"
+                    echo "======================================"
+
                     docker run -d \
                         --name campusstay_app \
                         --network campusstay_network \
                         -p 9090:80 \
                         -e DB_HOST=campusstay_db \
-                        -e DB_NAME=campus_stay \
+                        -e DB_NAME=campusstay \
                         -e DB_USER=campusstay_user \
                         -e DB_PASS=CampusStay2024 \
                         campusstay-app:latest
 
-                    echo "=== Running containers ==="
-                    docker ps | grep campusstay || true
+                    echo "======================================"
+                    echo "RUNNING CONTAINERS"
+                    echo "======================================"
+
+                    docker ps
                 '''
             }
         }
 
+        // ==========================================
+        // HEALTH CHECK
+        // ==========================================
         stage('Health Check') {
             steps {
-                echo 'Verifying application health...'
+
+                echo 'Performing health check...'
+
                 sh '''
-                    sleep 8
+                    sleep 10
 
-                    APP_UP=$(docker ps --filter name=campusstay_app --filter status=running -q | wc -l)
-                    DB_UP=$(docker ps  --filter name=campusstay_db  --filter status=running -q | wc -l)
+                    APP_STATUS=$(docker ps \
+                        --filter name=campusstay_app \
+                        --filter status=running \
+                        -q | wc -l)
 
-                    if [ "$APP_UP" -ge "1" ]; then
-                        echo "OK: App container is running"
+                    DB_STATUS=$(docker ps \
+                        --filter name=campusstay_db \
+                        --filter status=running \
+                        -q | wc -l)
+
+                    if [ "$APP_STATUS" -ge "1" ]; then
+                        echo "SUCCESS: App container is running"
                     else
-                        echo "FAIL: App container is NOT running"
-                        docker logs campusstay_app 2>&1 | tail -20 || true
+                        echo "ERROR: App container failed"
+
+                        docker logs campusstay_app || true
+
                         exit 1
                     fi
 
-                    if [ "$DB_UP" -ge "1" ]; then
-                        echo "OK: DB container is running"
+                    if [ "$DB_STATUS" -ge "1" ]; then
+                        echo "SUCCESS: DB container is running"
                     else
-                        echo "FAIL: DB container is NOT running"
-                        docker logs campusstay_db 2>&1 | tail -20 || true
+                        echo "ERROR: DB container failed"
+
+                        docker logs campusstay_db || true
+
                         exit 1
                     fi
 
-                    HTTP=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:9090/ 2>/dev/null || echo 000)
-                    echo "HTTP Response: $HTTP"
-                    if [ "$HTTP" = "200" ] || [ "$HTTP" = "302" ]; then
-                        echo "OK: Application is responding!"
+                    HTTP_CODE=$(curl -s -o /dev/null \
+                        -w "%{http_code}" \
+                        http://localhost:9090/ || echo 000)
+
+                    echo "HTTP STATUS: $HTTP_CODE"
+
+                    if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "302" ]; then
+                        echo "SUCCESS: Website is accessible!"
                     else
-                        echo "WARNING: App returned HTTP $HTTP (may still be starting)"
+                        echo "WARNING: Website returned HTTP $HTTP_CODE"
                     fi
                 '''
             }
         }
 
+        // ==========================================
+        // CLEANUP
+        // ==========================================
         stage('Cleanup') {
             steps {
-                echo 'Cleaning up old Docker images...'
-                sh 'docker image prune -f || true'
+
+                echo 'Cleaning unused Docker images...'
+
+                sh '''
+                    docker image prune -f || true
+                '''
             }
         }
     }
 
+    // ==========================================
+    // POST BUILD ACTIONS
+    // ==========================================
     post {
+
         success {
-            echo "SUCCESS: CampusStay deployed at http://localhost:9090"
+
+            echo '======================================'
+            echo 'DEPLOYMENT SUCCESSFUL!'
+            echo '======================================'
+
+            echo "CampusStay URL:"
+            echo "http://localhost:9090"
         }
+
         failure {
-            echo 'FAILED! Printing container logs...'
-            sh 'docker logs campusstay_app 2>&1 | tail -30 || true'
-            sh 'docker logs campusstay_db  2>&1 | tail -30 || true'
+
+            echo '======================================'
+            echo 'DEPLOYMENT FAILED!'
+            echo '======================================'
+
+            sh 'docker logs campusstay_app || true'
+
+            sh 'docker logs campusstay_db || true'
         }
+
         always {
-            sh 'docker ps | grep campusstay || echo "No campusstay containers running"'
-            echo "Build #${BUILD_NUMBER} finished."
+
+            echo '======================================'
+            echo 'RUNNING CONTAINERS'
+            echo '======================================'
+
+            sh 'docker ps || true'
+
+            echo "Build #${BUILD_NUMBER} completed."
         }
     }
 }
