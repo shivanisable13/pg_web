@@ -1,0 +1,84 @@
+version: '3.8'
+
+# ============================================================
+# Docker Compose for CampusStay
+# Services: PHP+Apache App, MySQL Database, phpMyAdmin
+# ============================================================
+
+services:
+
+  # ── PHP + Apache Application ──────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: campusstay_app
+    restart: unless-stopped
+    ports:
+      - "8080:80"         # Access app at http://localhost:8080
+    volumes:
+      - .:/var/www/html   # Live code sync (dev mode)
+      - uploads_data:/var/www/html/uploads
+    environment:
+      - DB_HOST=db
+      - DB_NAME=campus_stay
+      - DB_USER=campusstay_user
+      - DB_PASS=CampusStay@2024
+      - APP_ENV=production
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - campusstay_network
+
+  # ── MySQL Database ────────────────────────────────────────
+  db:
+    image: mysql:8.0
+    container_name: campusstay_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: campus_stay
+      MYSQL_USER: campusstay_user
+      MYSQL_PASSWORD: CampusStay@2024
+      MYSQL_ROOT_PASSWORD: RootPass@2024
+    ports:
+      - "3307:3306"       # Exposed on 3307 to avoid conflict with local MySQL
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database/campus_stay.sql:/docker-entrypoint-initdb.d/init.sql:ro  # Auto-import schema
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pRootPass@2024"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - campusstay_network
+
+  # ── phpMyAdmin (Database GUI) ─────────────────────────────
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: campusstay_phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8081:80"         # Access phpMyAdmin at http://localhost:8081
+    environment:
+      PMA_HOST: db
+      PMA_USER: campusstay_user
+      PMA_PASSWORD: CampusStay@2024
+      MYSQL_ROOT_PASSWORD: RootPass@2024
+    depends_on:
+      - db
+    networks:
+      - campusstay_network
+
+# ── Persistent Volumes ────────────────────────────────────────
+volumes:
+  db_data:
+    driver: local
+  uploads_data:
+    driver: local
+
+# ── Network ───────────────────────────────────────────────────
+networks:
+  campusstay_network:
+    driver: bridge
