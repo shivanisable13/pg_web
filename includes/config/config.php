@@ -43,13 +43,13 @@ define('BASE_PATH', dirname(__DIR__, 2));
 // 2. Local XAMPP fallback
 // ============================================================
 
-define('DB_HOST', getenv('DB_HOST') ?: '127.0.0.1');
+define('DB_HOST', getenv('DB_HOST') ?: 'campusstay_db');
 
 define('DB_NAME', getenv('DB_NAME') ?: 'campusstay');
 
-define('DB_USER', getenv('DB_USER') ?: 'root');
+define('DB_USER', getenv('DB_USER') ?: 'campusstay_user');
 
-define('DB_PASS', getenv('DB_PASS') ?: '');
+define('DB_PASS', getenv('DB_PASS') ?: 'CampusStay2024');
 
 // ============================================================
 // DATABASE CONNECTION (PDO)
