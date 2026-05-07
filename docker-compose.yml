@@ -2,6 +2,7 @@ version: '3.9'
 
 # ============================================================
 # CampusStay Production Docker Compose
+# PHP + Apache + MySQL + phpMyAdmin
 # ============================================================
 
 services:
@@ -10,6 +11,7 @@ services:
   # PHP + APACHE APPLICATION
   # ==========================================================
   app:
+
     build:
       context: .
       dockerfile: Dockerfile
@@ -19,7 +21,7 @@ services:
     restart: always
 
     ports:
-      - "9090:80"
+      - "80:80"
 
     environment:
       DB_HOST: db
@@ -48,6 +50,7 @@ services:
   # MYSQL DATABASE
   # ==========================================================
   db:
+
     image: mysql:8.0
 
     container_name: campusstay_db
@@ -68,19 +71,20 @@ services:
 
     volumes:
       - db_data:/var/lib/mysql
-      - ./database/campusstay.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
 
     healthcheck:
-      test: [
-        "CMD",
-        "mysqladmin",
-        "ping",
-        "-h",
-        "localhost",
-        "-u",
-        "root",
-        "-pRootPass2024"
-      ]
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-pRootPass2024"
+        ]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -92,6 +96,7 @@ services:
   # PHPMYADMIN
   # ==========================================================
   phpmyadmin:
+
     image: phpmyadmin:latest
 
     container_name: campusstay_phpmyadmin
@@ -114,7 +119,7 @@ services:
       - campusstay_network
 
 # ============================================================
-# VOLUMES
+# PERSISTENT VOLUMES
 # ============================================================
 
 volumes:
