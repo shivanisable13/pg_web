@@ -26,17 +26,24 @@ pipeline {
 
         stage('PHP Syntax Check') {
             steps {
-                echo '🔍 Checking PHP syntax...'
+                echo '🔍 Checking PHP syntax using Docker PHP image...'
                 sh '''
-                    ERRORS=0
-                    for FILE in $(find . -name "*.php" -not -path "./vendor/*"); do
-                        php -l "$FILE" > /dev/null 2>&1 || ERRORS=$((ERRORS+1))
-                    done
-                    if [ "$ERRORS" -gt "0" ]; then
-                        echo "❌ Found $ERRORS PHP syntax error(s)!"
-                        exit 1
+                    if docker run --rm -v "$PWD":/app php:8.2-cli bash -c "
+                        ERRORS=0
+                        for FILE in \$(find /app -name '*.php' -not -path '/app/vendor/*'); do
+                            php -l \"\$FILE\" > /dev/null 2>&1 || ERRORS=\$((ERRORS+1))
+                        done
+                        if [ \"\$ERRORS\" -gt 0 ]; then
+                            echo \"Found \$ERRORS PHP syntax error(s)\"
+                            exit 1
+                        else
+                            echo \"All PHP files passed syntax check!\"
+                        fi
+                    "; then
+                        echo "✅ PHP syntax check passed!"
                     else
-                        echo "✅ All PHP files passed syntax check!"
+                        echo "❌ PHP syntax errors found!"
+                        exit 1
                     fi
                 '''
             }
@@ -46,9 +53,9 @@ pipeline {
             steps {
                 echo '🔒 Running basic security checks...'
                 sh '''
-                    echo "Checking for hardcoded passwords..."
-                    if grep -rn "SMTP_PASS" includes/config/config.php | grep -v "define"; then
-                        echo "WARNING: Review credentials in config.php before production deployment."
+                    echo "Checking for hardcoded credentials..."
+                    if grep -rn "SMTP_PASS" includes/config/config.php; then
+                        echo "WARNING: Credentials found in config.php - use environment variables in production."
                     fi
                     echo "✅ Security scan complete."
                 '''
@@ -62,9 +69,8 @@ pipeline {
                     docker build \\
                         -t ${DOCKER_IMAGE}:${DOCKER_TAG} \\
                         -t ${DOCKER_IMAGE}:latest \\
-                        --no-cache \\
                         .
-                    echo "✅ Docker image built successfully!"
+                    echo "✅ Docker image built!"
                     docker images | grep ${DOCKER_IMAGE}
                 """
             }
@@ -72,13 +78,20 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                echo '🚀 Starting CampusStay services via Docker Compose...'
+                echo '🚀 Starting services via Docker Compose...'
                 sh '''
-                    docker-compose down --remove-orphans || true
-                    docker-compose up -d --build
-                    echo "⏳ Waiting for services to start..."
+                    # Support both docker-compose v1 and docker compose v2
+                    if command -v docker-compose > /dev/null 2>&1; then
+                        COMPOSE_CMD="docker-compose"
+                    else
+                        COMPOSE_CMD="docker compose"
+                    fi
+
+                    $COMPOSE_CMD down --remove-orphans || true
+                    $COMPOSE_CMD up -d --build
+                    echo "⏳ Waiting for services..."
                     sleep 15
-                    docker-compose ps
+                    $COMPOSE_CMD ps
                 '''
             }
         }
@@ -87,22 +100,28 @@ pipeline {
             steps {
                 echo '🏥 Verifying application health...'
                 sh """
-                    APP_RUNNING=\$(docker-compose ps | grep campusstay_app | grep Up | wc -l)
-                    DB_RUNNING=\$(docker-compose ps | grep campusstay_db | grep Up | wc -l)
-
-                    if [ "\$APP_RUNNING" = "1" ]; then
-                        echo "✅ App container is running"
+                    if command -v docker-compose > /dev/null 2>&1; then
+                        COMPOSE_CMD="docker-compose"
                     else
-                        echo "❌ App container is NOT running"
-                        docker-compose logs app --tail=30
+                        COMPOSE_CMD="docker compose"
+                    fi
+
+                    APP_UP=\$(\$COMPOSE_CMD ps | grep campusstay_app | grep -c Up || echo 0)
+                    DB_UP=\$(\$COMPOSE_CMD ps | grep campusstay_db | grep -c Up || echo 0)
+
+                    if [ "\$APP_UP" -ge "1" ]; then
+                        echo "✅ App container is UP"
+                    else
+                        echo "❌ App container is DOWN"
+                        \$COMPOSE_CMD logs app --tail=30
                         exit 1
                     fi
 
-                    if [ "\$DB_RUNNING" = "1" ]; then
-                        echo "✅ Database container is running"
+                    if [ "\$DB_UP" -ge "1" ]; then
+                        echo "✅ DB container is UP"
                     else
-                        echo "❌ Database container is NOT running"
-                        docker-compose logs db --tail=30
+                        echo "❌ DB container is DOWN"
+                        \$COMPOSE_CMD logs db --tail=30
                         exit 1
                     fi
 
@@ -110,10 +129,9 @@ pipeline {
                     HTTP_CODE=\$(curl -s -o /dev/null -w "%{http_code}" http://localhost:${DEPLOY_PORT}/ || echo 000)
                     echo "HTTP Response: \$HTTP_CODE"
                     if [ "\$HTTP_CODE" = "200" ] || [ "\$HTTP_CODE" = "302" ]; then
-                        echo "✅ Application is responding on port ${DEPLOY_PORT}"
+                        echo "✅ Application is live on port ${DEPLOY_PORT}"
                     else
-                        echo "⚠️  App returned HTTP \$HTTP_CODE — check container logs"
-                        docker-compose logs app --tail=20
+                        echo "⚠️  App returned HTTP \$HTTP_CODE"
                     fi
                 """
             }
@@ -133,7 +151,13 @@ pipeline {
         }
         failure {
             echo '❌ Pipeline FAILED! Check logs above.'
-            sh 'docker-compose logs --tail=30 || true'
+            sh '''
+                if command -v docker-compose > /dev/null 2>&1; then
+                    docker-compose logs --tail=30 || true
+                else
+                    docker compose logs --tail=30 || true
+                fi
+            '''
         }
         always {
             echo "Pipeline finished — Build #${BUILD_NUMBER}"
