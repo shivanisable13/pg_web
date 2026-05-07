@@ -5,7 +5,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'campusstay-app'
         DOCKER_TAG   = "${BUILD_NUMBER}"
-        DEPLOY_PORT  = '9090'
+        DEPLOY_PORT  = '80'
     }
 
     options {
@@ -16,11 +16,12 @@ pipeline {
 
     stages {
 
-        // ==========================================
+        // =====================================================
         // CHECKOUT SOURCE CODE
-        // ==========================================
+        // =====================================================
         stage('Checkout') {
             steps {
+
                 echo 'Cloning GitHub repository...'
 
                 checkout scm
@@ -29,11 +30,12 @@ pipeline {
             }
         }
 
-        // ==========================================
+        // =====================================================
         // PHP SYNTAX CHECK
-        // ==========================================
+        // =====================================================
         stage('PHP Syntax Check') {
             steps {
+
                 echo 'Checking PHP syntax...'
 
                 sh '''
@@ -46,24 +48,25 @@ pipeline {
             }
         }
 
-        // ==========================================
+        // =====================================================
         // SECURITY CHECK
-        // ==========================================
+        // =====================================================
         stage('Security Scan') {
             steps {
+
                 echo 'Running security scan...'
 
                 sh '''
                     grep -rn "SMTP_PASS" includes/config/config.php \
-                    && echo "WARNING: Credentials detected in config.php" \
+                    && echo "WARNING: Credentials found in config.php" \
                     || echo "Security scan completed."
                 '''
             }
         }
 
-        // ==========================================
+        // =====================================================
         // BUILD DOCKER IMAGE
-        // ==========================================
+        // =====================================================
         stage('Docker Build') {
             steps {
 
@@ -79,9 +82,9 @@ pipeline {
             }
         }
 
-        // ==========================================
+        // =====================================================
         // DEPLOY APPLICATION
-        // ==========================================
+        // =====================================================
         stage('Deploy') {
             steps {
 
@@ -130,7 +133,7 @@ pipeline {
                         mysql:8.0
 
                     echo "Waiting for MySQL to initialize..."
-                    sleep 35
+                    sleep 40
 
                     echo "======================================"
                     echo "STARTING PHP APPLICATION"
@@ -139,7 +142,7 @@ pipeline {
                     docker run -d \
                         --name campusstay_app \
                         --network campusstay_network \
-                        -p 9090:80 \
+                        -p 80:80 \
                         -e DB_HOST=campusstay_db \
                         -e DB_NAME=campusstay \
                         -e DB_USER=campusstay_user \
@@ -155,9 +158,9 @@ pipeline {
             }
         }
 
-        // ==========================================
+        // =====================================================
         // HEALTH CHECK
-        // ==========================================
+        // =====================================================
         stage('Health Check') {
             steps {
 
@@ -198,7 +201,7 @@ pipeline {
 
                     HTTP_CODE=$(curl -s -o /dev/null \
                         -w "%{http_code}" \
-                        http://localhost:9090/ || echo 000)
+                        http://localhost/ || echo 000)
 
                     echo "HTTP STATUS: $HTTP_CODE"
 
@@ -211,9 +214,9 @@ pipeline {
             }
         }
 
-        // ==========================================
+        // =====================================================
         // CLEANUP
-        // ==========================================
+        // =====================================================
         stage('Cleanup') {
             steps {
 
@@ -226,9 +229,9 @@ pipeline {
         }
     }
 
-    // ==========================================
+    // =====================================================
     // POST BUILD ACTIONS
-    // ==========================================
+    // =====================================================
     post {
 
         success {
@@ -238,7 +241,7 @@ pipeline {
             echo '======================================'
 
             echo "CampusStay URL:"
-            echo "http://localhost:9090"
+            echo "http://localhost"
         }
 
         failure {
