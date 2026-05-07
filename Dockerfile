@@ -3,7 +3,6 @@
 # PHP 8.2 + Apache
 # ============================================================
 
-
 FROM php:8.2-apache
 
 # ============================================================
@@ -69,6 +68,9 @@ RUN sed -i 's/AllowOverride None/AllowOverride All/g' \
 # ============================================================
 
 WORKDIR /var/www/html
+
+# Remove default Apache page
+RUN rm -f /var/www/html/index.html
 
 # ============================================================
 # COPY APPLICATION FILES
