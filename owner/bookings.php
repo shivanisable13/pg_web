@@ -51,7 +51,6 @@ $bookings = $stmt->fetchAll();
                                 <th>PG / Room</th>
                                 <th>Move-in Date</th>
                                 <th>Status</th>
-                                <th class="text-end pe-4">Action</th>
                             </tr>
                         </thead>
                         <tbody>
