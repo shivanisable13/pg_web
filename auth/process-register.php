@@ -6,19 +6,17 @@ require_once '../includes/functions.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $full_name = sanitize($_POST['full_name']);
     $email = sanitize($_POST['email']);
-    $country_code = sanitize($_POST['country_code'] ?? '+91');
-    $phone_number = sanitize($_POST['phone']);
-    $phone = $country_code . ' ' . $phone_number;
+    $phone = sanitize($_POST['phone']);
     $password = $_POST['password'];
     $role = sanitize($_POST['role']);
 
     // Basic Validation
-    if (empty($full_name) || empty($email) || empty($phone_number) || empty($password)) {
+    if (empty($full_name) || empty($email) || empty($phone) || empty($password)) {
         setFlash('danger', 'All fields are required.');
         redirect('/auth/register.php');
     }
 
-    if (!preg_match('/^[0-9]{10}$/', $phone_number)) {
+    if (!preg_match('/^[0-9]{10}$/', $phone)) {
         setFlash('danger', 'Phone number must be exactly 10 digits.');
         redirect('/auth/register.php');
     }
