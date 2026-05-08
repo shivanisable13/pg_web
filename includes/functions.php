@@ -131,7 +131,7 @@ function isFavorited($user_id, $pg_id) {
     global $pdo;
     if (empty($user_id) || empty($pg_id)) return false;
     try {
-        $stmt = $pdo->prepare("SELECT id FROM favorites WHERE user_id = ? AND pg_id = ?");
+        $stmt = $pdo->prepare("SELECT 1 FROM favorites WHERE user_id = ? AND pg_id = ?");
         $stmt->execute([$user_id, $pg_id]);
         return (bool) $stmt->fetch();
     } catch (Exception $e) {
