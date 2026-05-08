@@ -21,8 +21,8 @@ $stmt = $pdo->prepare("SELECT DATE_FORMAT(p.created_at, '%b %Y') as month, SUM(p
                       JOIN bookings b ON p.booking_id = b.id 
                       JOIN pg_listings pg ON b.pg_id = pg.id 
                       WHERE pg.owner_id = ? AND p.payment_status = 'captured'
-                      GROUP BY DATE_FORMAT(p.created_at, '%Y-%m')
-                      ORDER BY p.created_at DESC LIMIT 6");
+                      GROUP BY DATE_FORMAT(p.created_at, '%Y-%m'), month
+                      ORDER BY MAX(p.created_at) DESC LIMIT 6");
 $stmt->execute([$owner_id]);
 $monthly_data = $stmt->fetchAll();
 ?>
