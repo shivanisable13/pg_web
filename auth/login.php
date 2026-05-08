@@ -28,8 +28,29 @@ require_once '../includes/header.php';
                         </div>
                         <div class="input-group">
                             <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-lock text-muted"></i></span>
-                            <input type="password" name="password" class="form-control border-start-0" placeholder="••••••••" required>
+                            <input type="password" name="password" id="password" class="form-control border-start-0 border-end-0" placeholder="••••••••" required>
+                            <span class="input-group-text bg-light border-start-0 cursor-pointer" id="togglePassword">
+                                <i class="fa-solid fa-eye text-muted"></i>
+                            </span>
                         </div>
+                    </div>
+
+                    <script>
+                    document.getElementById('togglePassword').addEventListener('click', function() {
+                        const passwordInput = document.getElementById('password');
+                        const icon = this.querySelector('i');
+                        
+                        if (passwordInput.type === 'password') {
+                            passwordInput.type = 'text';
+                            icon.classList.remove('fa-eye');
+                            icon.classList.add('fa-eye-slash');
+                        } else {
+                            passwordInput.type = 'password';
+                            icon.classList.remove('fa-eye-slash');
+                            icon.classList.add('fa-eye');
+                        }
+                    });
+                    </script>
                     </div>
 
                     <div class="mb-4 form-check">
