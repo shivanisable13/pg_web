@@ -52,7 +52,11 @@ $listings = $stmt->fetchAll();
                         <?php if($pg['status'] === 'pending'): ?>
                         <a href="approvals.php" class="btn btn-sm btn-primary rounded-pill px-3">Review</a>
                         <?php endif; ?>
-                        <button class="btn btn-sm btn-outline-danger rounded-circle ms-2"><i class="fa-solid fa-trash"></i></button>
+                        <a href="delete_listing.php?id=<?php echo $pg['id']; ?>" 
+                           class="btn btn-sm btn-outline-danger rounded-circle ms-2"
+                           onclick="return confirm('Are you sure you want to delete this property? This action cannot be undone.')">
+                            <i class="fa-solid fa-trash"></i>
+                        </a>
                     </div>
                 </div>
             </div>
