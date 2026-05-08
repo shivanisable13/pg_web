@@ -1,5 +1,6 @@
 -- CampusStay Database Schema
-
+CREATE DATABASE IF NOT EXISTS campus_stay;
+USE campus_stay;
 
 -- Users Table
 CREATE TABLE users (
