@@ -5,21 +5,19 @@ require_once 'includes/header.php';
 require_once 'includes/config/db.php';
 
 // Fetch Featured PGs
-$stmt = $pdo->query("
-    SELECT 
-        p.*,
-        MIN(pi.image_url) AS image_url,
-        MIN(r.rent_per_month) AS min_rent
-    FROM pg_listings p
-    LEFT JOIN pg_images pi 
-        ON p.id = pi.pg_id 
-        AND pi.is_featured = 1
-    LEFT JOIN rooms r 
-        ON p.id = r.pg_id
-    WHERE p.status = 'approved'
-    GROUP BY p.id
-    LIMIT 6
-");
+$stmt = $pdo->query("SELECT 
+                    p.*, 
+                    MIN(pi.image_url) as image_url, 
+                    MIN(r.rent_per_month) as min_rent 
+                    FROM pg_listings p 
+                    LEFT JOIN pg_images pi 
+                        ON p.id = pi.pg_id 
+                        AND pi.is_featured = 1
+                    LEFT JOIN rooms r 
+                        ON p.id = r.pg_id
+                    WHERE p.status = 'approved'
+                    GROUP BY p.id 
+                    LIMIT 6");
 
 $featuredPGs = $stmt->fetchAll();
 ?>
