@@ -32,14 +32,8 @@ require_once '../includes/header.php';
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Phone Number</label>
                         <div class="input-group">
-                            <select class="form-select border-end-0 bg-light" name="country_code" style="max-width: 90px; font-size: 0.9rem;">
-                                <option value="+91" selected>+91</option>
-                                <option value="+1">+1</option>
-                                <option value="+44">+44</option>
-                                <option value="+971">+971</option>
-                                <option value="+61">+61</option>
-                            </select>
-                            <input type="tel" name="phone" id="phone" class="form-control" 
+                            <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-phone text-muted"></i></span>
+                            <input type="tel" name="phone" id="phone" class="form-control border-start-0" 
                                    placeholder="9876543210" required 
                                    pattern="[0-9]{10}" 
                                    maxlength="10" 
