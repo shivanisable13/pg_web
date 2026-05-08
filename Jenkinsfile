@@ -53,7 +53,6 @@ pipeline {
                 echo "Removing old containers..."
 
                 docker rm -f $APP_CONTAINER || true
-                docker rm -f $DB_CONTAINER || true
                 '''
             }
         }
