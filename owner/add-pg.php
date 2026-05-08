@@ -51,10 +51,8 @@ $all_amenities = $amenities_stmt->fetchAll();
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Property Type</label>
-                                <select name="property_type" class="form-select" required>
+                                <select name="property_type" class="form-select" required readonly>
                                     <option value="pg">PG</option>
-                                    <option value="hostel">Hostel</option>
-                                    <option value="flat">Shared Flat</option>
                                 </select>
                             </div>
                         </div>
