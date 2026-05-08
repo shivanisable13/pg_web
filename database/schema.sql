@@ -151,7 +151,7 @@ INSERT IGNORE INTO amenities (name, icon_class) VALUES
 ('CCTV', 'fa-video'),
 ('Power Backup', 'fa-bolt');
 
-INSERT INTO users (
+INSERT IGNORE INTO users (
     full_name,
     email,
     phone,
