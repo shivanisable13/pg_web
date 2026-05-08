@@ -163,7 +163,7 @@ INSERT INTO users (
     'Admin User',
     'admin@campusstay.com',
     '9876543210',
-    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.ogKn4a1L8z7Y5Y2e',
+    '$2y$10$SSDM/qb57QewttpJVzlPvebyhRXyw4T2kqvSIFcPeWHIEMwzsg8aW',
     'admin',
     'default_user.png',
     TRUE
