@@ -141,6 +141,14 @@ CREATE TABLE IF NOT EXISTS favorites (
     FOREIGN KEY (pg_id) REFERENCES pg_listings(id) ON DELETE CASCADE
 );
 
+-- System Settings Table
+CREATE TABLE IF NOT EXISTS settings (
+    setting_key VARCHAR(100) PRIMARY KEY,
+    setting_value TEXT,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
 INSERT IGNORE INTO amenities (name, icon_class) VALUES
 ('WiFi', 'fa-wifi'),
 ('AC', 'fa-snowflake'),
