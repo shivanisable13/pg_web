@@ -10,7 +10,7 @@ $min_price = isset($_GET['min_price']) ? (float)$_GET['min_price'] : 0;
 $max_price = isset($_GET['max_price']) ? (float)$_GET['max_price'] : 50000;
 
 // Build Query
-$query = "SELECT p.*, pi.image_url, MIN(r.rent_per_month) as min_rent 
+$query = "SELECT p.*, MIN(pi.image_url) as image_url, MIN(r.rent_per_month) as min_rent 
           FROM pg_listings p 
           LEFT JOIN pg_images pi ON p.id = pi.pg_id AND pi.is_featured = 1
           LEFT JOIN rooms r ON p.id = r.pg_id
