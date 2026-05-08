@@ -72,6 +72,14 @@ $users = $pdo->query($query)->fetchAll();
                                     <a href="view_user.php?id=<?php echo $u['id']; ?>" class="btn btn-sm btn-light rounded-pill border me-1" title="View Details">
                                         <i class="fa-solid fa-eye"></i>
                                     </a>
+                                    <?php if($u['id'] != $_SESSION['user_id']): ?>
+                                    <a href="delete_user.php?id=<?php echo $u['id']; ?>" 
+                                       class="btn btn-sm btn-outline-danger rounded-pill border" 
+                                       title="Delete User"
+                                       onclick="return confirm('Are you sure you want to delete this user? All their data will be permanently removed.')">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </a>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
