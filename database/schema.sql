@@ -151,4 +151,22 @@ INSERT IGNORE INTO amenities (name, icon_class) VALUES
 ('CCTV', 'fa-video'),
 ('Power Backup', 'fa-bolt');
 
+INSERT INTO users (
+    full_name,
+    email,
+    phone,
+    password,
+    role,
+    profile_image,
+    is_verified
+) VALUES (
+    'Admin User',
+    'admin@campusstay.com',
+    '9876543210',
+    'admin123',
+    'admin',
+    'default_user.png',
+    TRUE
+);
+
 SET FOREIGN_KEY_CHECKS = 1;
