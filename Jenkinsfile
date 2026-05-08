@@ -54,22 +54,28 @@ pipeline {
         // START MYSQL CONTAINER
         // ============================================
         stage('Start MySQL Container') {
-            steps {
+    steps {
 
-                sh '''
-                docker start $DB_CONTAINER || docker run -d \
-                --name $DB_CONTAINER \
-                --network campusstay-network \
-                -v campusstay_mysql_data:/var/lib/mysql \
-                -e MYSQL_ROOT_PASSWORD=$ROOT_PASS \
-                -e MYSQL_DATABASE=$DB_NAME \
-                -e MYSQL_USER=$DB_USER \
-                -e MYSQL_PASSWORD=$DB_PASS \
-                -p 3307:3306 \
-                mysql:8.0
-                '''
-            }
-        }
+        sh '''
+        echo "Removing old DB container if exists..."
+
+        docker rm -f $DB_CONTAINER || true
+
+        echo "Starting fresh MySQL container..."
+
+        docker run -d \
+        --name $DB_CONTAINER \
+        --network campusstay-network \
+        -v campusstay_mysql_data:/var/lib/mysql \
+        -e MYSQL_ROOT_PASSWORD=$ROOT_PASS \
+        -e MYSQL_DATABASE=$DB_NAME \
+        -e MYSQL_USER=$DB_USER \
+        -e MYSQL_PASSWORD=$DB_PASS \
+        -p 3307:3306 \
+        mysql:8.0
+        '''
+    }
+}
 
         // ============================================
         // WAIT FOR MYSQL
