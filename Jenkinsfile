@@ -128,20 +128,31 @@ pipeline {
 
         stage('Import Database Schema') {
 
-            steps {
+    steps {
 
-                sh '''
-                echo "Importing schema.sql..."
+        sh '''
+        echo "Waiting additional time for DB creation..."
 
-                docker exec -i $DB_CONTAINER mysql \
-                    -u root \
-                    -p$ROOT_PASS \
-                    $DB_NAME < database/schema.sql
+        sleep 20
 
-                echo "Database imported successfully!"
-                '''
-            }
-        }
+        echo "Checking databases..."
+
+        docker exec $DB_CONTAINER mysql \
+        -u root \
+        -p$ROOT_PASS \
+        -e "SHOW DATABASES;"
+
+        echo "Importing schema.sql..."
+
+        docker exec -i $DB_CONTAINER mysql \
+        -u root \
+        -p$ROOT_PASS \
+        < database/schema.sql
+
+        echo "Database schema imported successfully!"
+        '''
+    }
+}
 
         // ============================================
         // BUILD APPLICATION IMAGE
