@@ -28,14 +28,14 @@ if (!$pg_id) {
 
 try {
     // Check if already favorited
-    $stmt = $pdo->prepare("SELECT id FROM favorites WHERE user_id = ? AND pg_id = ?");
+    $stmt = $pdo->prepare("SELECT 1 FROM favorites WHERE user_id = ? AND pg_id = ?");
     $stmt->execute([$user_id, $pg_id]);
-    $fav = $stmt->fetch();
+    $exists = $stmt->fetch();
 
-    if ($fav) {
+    if ($exists) {
         // Remove from favorites
-        $stmt = $pdo->prepare("DELETE FROM favorites WHERE id = ?");
-        $stmt->execute([$fav['id']]);
+        $stmt = $pdo->prepare("DELETE FROM favorites WHERE user_id = ? AND pg_id = ?");
+        $stmt->execute([$user_id, $pg_id]);
         echo json_encode(['success' => true, 'action' => 'removed']);
     } else {
         // Add to favorites
