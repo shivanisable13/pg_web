@@ -255,57 +255,75 @@ $featuredPGs = $stmt->fetchAll();
 
         <div class="row g-4">
 
+            <!-- Search -->
             <div class="col-md-4">
 
-                <div class="glass-card p-5 text-center h-100 hover-translate">
+                <a href="search.php" class="text-decoration-none d-block">
 
-                    <div class="icon-box bg-primary-light text-primary mb-4 mx-auto">
-                        <i class="fa-solid fa-magnifying-glass fa-2x"></i>
+                    <div class="glass-card p-5 text-center h-100 hover-translate">
+
+                        <div class="icon-box bg-primary-light text-primary mb-4 mx-auto">
+                            <i class="fa-solid fa-magnifying-glass fa-2x"></i>
+                        </div>
+
+                        <h4 class="fw-bold text-dark">Search</h4>
+
+                        <p class="text-muted">
+                            Explore verified PGs by city, budget and amenities.
+                        </p>
+
                     </div>
 
-                    <h4 class="fw-bold">Search</h4>
-
-                    <p class="text-muted">
-                        Explore verified PGs by city, budget and amenities.
-                    </p>
-
-                </div>
+                </a>
 
             </div>
 
+            <!-- Book -->
             <div class="col-md-4">
 
-                <div class="glass-card p-5 text-center h-100 hover-translate">
+                <a href="search.php" class="text-decoration-none d-block">
 
-                    <div class="icon-box bg-success-light text-success mb-4 mx-auto">
-                        <i class="fa-solid fa-calendar-check fa-2x"></i>
+                    <div class="glass-card p-5 text-center h-100 hover-translate">
+
+                        <div class="icon-box bg-success-light text-success mb-4 mx-auto">
+                            <i class="fa-solid fa-calendar-check fa-2x"></i>
+                        </div>
+
+                        <h4 class="fw-bold text-dark">Book</h4>
+
+                        <p class="text-muted">
+                            Select your room and confirm instantly online.
+                        </p>
+
                     </div>
 
-                    <h4 class="fw-bold">Book</h4>
-
-                    <p class="text-muted">
-                        Select your room and confirm instantly online.
-                    </p>
-
-                </div>
+                </a>
 
             </div>
 
+            <!-- Move In -->
             <div class="col-md-4">
 
-                <div class="glass-card p-5 text-center h-100 hover-translate">
+                <a 
+                    href="<?php echo isLoggedIn() ? 'user/dashboard.php' : 'auth/login.php'; ?>" 
+                    class="text-decoration-none d-block"
+                >
 
-                    <div class="icon-box bg-warning-light text-warning mb-4 mx-auto">
-                        <i class="fa-solid fa-house fa-2x"></i>
+                    <div class="glass-card p-5 text-center h-100 hover-translate">
+
+                        <div class="icon-box bg-warning-light text-warning mb-4 mx-auto">
+                            <i class="fa-solid fa-house fa-2x"></i>
+                        </div>
+
+                        <h4 class="fw-bold text-dark">Move In</h4>
+
+                        <p class="text-muted">
+                            Shift smoothly into your new comfortable home.
+                        </p>
+
                     </div>
 
-                    <h4 class="fw-bold">Move In</h4>
-
-                    <p class="text-muted">
-                        Shift smoothly into your new comfortable home.
-                    </p>
-
-                </div>
+                </a>
 
             </div>
 
