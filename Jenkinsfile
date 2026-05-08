@@ -2,13 +2,26 @@ pipeline {
     agent any
 
     environment {
+
+        // ============================================
+        // DOCKER CONFIG
+        // ============================================
+
         IMAGE_NAME    = "shivanisable/campusstay"
-        APP_CONTAINER = "campusstay-app"
-        DB_CONTAINER  = "campusstay-db"
-        DB_NAME       = "campusstay"
-        DB_USER       = "campusstay_user"
-        DB_PASS       = "CampusStay2024"
-        ROOT_PASS     = "RootPass2024"
+
+        APP_CONTAINER = "campusstay_app"
+        DB_CONTAINER  = "campusstay_db"
+
+        NETWORK_NAME  = "campusstay-network"
+
+        // ============================================
+        // DATABASE CONFIG
+        // ============================================
+
+        DB_NAME   = "campusstay"
+        DB_USER   = "campusstay_user"
+        DB_PASS   = "CampusStay2024"
+        ROOT_PASS = "RootPass2024"
     }
 
     stages {
@@ -16,7 +29,9 @@ pipeline {
         // ============================================
         // CLONE SOURCE CODE
         // ============================================
+
         stage('Clone Code') {
+
             steps {
 
                 git branch: 'main',
@@ -27,25 +42,32 @@ pipeline {
         }
 
         // ============================================
-        // REMOVE OLD APP CONTAINER
+        // CLEAN OLD CONTAINERS
         // ============================================
-        stage('Cleanup Old App Container') {
+
+        stage('Cleanup Old Containers') {
+
             steps {
 
                 sh '''
+                echo "Removing old containers..."
+
                 docker rm -f $APP_CONTAINER || true
+                docker rm -f $DB_CONTAINER || true
                 '''
             }
         }
 
         // ============================================
-        // CREATE DOCKER NETWORK
+        // CREATE NETWORK
         // ============================================
+
         stage('Create Network') {
+
             steps {
 
                 sh '''
-                docker network create campusstay-network || true
+                docker network create $NETWORK_NAME || true
                 '''
             }
         }
@@ -53,34 +75,34 @@ pipeline {
         // ============================================
         // START MYSQL CONTAINER
         // ============================================
+
         stage('Start MySQL Container') {
-    steps {
 
-        sh '''
-        echo "Removing old DB container if exists..."
+            steps {
 
-        docker rm -f $DB_CONTAINER || true
+                sh '''
+                echo "Starting MySQL container..."
 
-        echo "Starting fresh MySQL container..."
-
-        docker run -d \
-        --name $DB_CONTAINER \
-        --network campusstay-network \
-        -v campusstay_mysql_data:/var/lib/mysql \
-        -e MYSQL_ROOT_PASSWORD=$ROOT_PASS \
-        -e MYSQL_DATABASE=$DB_NAME \
-        -e MYSQL_USER=$DB_USER \
-        -e MYSQL_PASSWORD=$DB_PASS \
-        -p 3307:3306 \
-        mysql:8.0
-        '''
-    }
-}
+                docker run -d \
+                --name $DB_CONTAINER \
+                --network $NETWORK_NAME \
+                -v campusstay_mysql_data:/var/lib/mysql \
+                -e MYSQL_ROOT_PASSWORD=$ROOT_PASS \
+                -e MYSQL_DATABASE=$DB_NAME \
+                -e MYSQL_USER=$DB_USER \
+                -e MYSQL_PASSWORD=$DB_PASS \
+                -p 3307:3306 \
+                mysql:8.0
+                '''
+            }
+        }
 
         // ============================================
         // WAIT FOR MYSQL
         // ============================================
+
         stage('Wait For MySQL') {
+
             steps {
 
                 sh '''
@@ -101,9 +123,11 @@ pipeline {
         }
 
         // ============================================
-        // IMPORT DATABASE SCHEMA
+        // IMPORT DATABASE
         // ============================================
+
         stage('Import Database Schema') {
+
             steps {
 
                 sh '''
@@ -122,7 +146,9 @@ pipeline {
         // ============================================
         // BUILD APPLICATION IMAGE
         // ============================================
+
         stage('Build App Image') {
+
             steps {
 
                 sh '''
@@ -134,15 +160,17 @@ pipeline {
         // ============================================
         // RUN APPLICATION CONTAINER
         // ============================================
+
         stage('Run App Container') {
+
             steps {
 
                 sh '''
-                docker rm -f $APP_CONTAINER || true
+                echo "Starting application container..."
 
                 docker run -d \
                 --name $APP_CONTAINER \
-                --network campusstay-network \
+                --network $NETWORK_NAME \
                 -v campusstay_uploads:/var/www/html/uploads \
                 -p 80:80 \
                 -e DB_HOST=$DB_CONTAINER \
@@ -157,14 +185,19 @@ pipeline {
         // ============================================
         // HEALTH CHECK
         // ============================================
+
         stage('Health Check') {
+
             steps {
 
                 sh '''
+                echo "Performing health check..."
+
                 sleep 10
 
                 curl -I http://localhost || true
 
+                echo "Running containers:"
                 docker ps
                 '''
             }
@@ -172,8 +205,9 @@ pipeline {
     }
 
     // ============================================
-    // POST BUILD
+    // POST BUILD ACTIONS
     // ============================================
+
     post {
 
         success {
@@ -198,6 +232,10 @@ pipeline {
         }
 
         always {
+
+            echo '======================================'
+            echo 'RUNNING CONTAINERS'
+            echo '======================================'
 
             sh 'docker ps || true'
         }
