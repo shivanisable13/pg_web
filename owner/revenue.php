@@ -19,7 +19,8 @@ $owner_id = $_SESSION['user_id'];
 |--------------------------------------------------------------------------
 */
 $stmt = $pdo->prepare("
-    SELECT SUM(p.amount) as total_revenue
+    SELECT 
+        SUM(p.amount) as total_revenue
     FROM payments p
     JOIN bookings b ON p.booking_id = b.id
     JOIN pg_listings pg ON b.pg_id = pg.id
@@ -38,16 +39,17 @@ $total_revenue = $stmt->fetchColumn() ?: 0;
 */
 $stmt = $pdo->prepare("
     SELECT 
-        DATE_FORMAT(p.created_at, '%b %Y') as month,
-        SUM(p.amount) as revenue,
-        MAX(p.created_at) as latest_date
+        YEAR(p.created_at) AS year,
+        MONTH(p.created_at) AS month_num,
+        DATE_FORMAT(MAX(p.created_at), '%b %Y') AS month,
+        SUM(p.amount) AS revenue
     FROM payments p
     JOIN bookings b ON p.booking_id = b.id
     JOIN pg_listings pg ON b.pg_id = pg.id
     WHERE pg.owner_id = ?
     AND p.payment_status = 'captured'
     GROUP BY YEAR(p.created_at), MONTH(p.created_at)
-    ORDER BY latest_date DESC
+    ORDER BY year DESC, month_num DESC
     LIMIT 6
 ");
 
@@ -62,7 +64,10 @@ $monthly_data = $stmt->fetchAll();
 */
 $stmt = $pdo->prepare("
     SELECT 
-        p.*,
+        p.id,
+        p.amount,
+        p.transaction_id,
+        p.created_at,
         u.full_name as student_name,
         pg.title as pg_title
     FROM payments p
@@ -86,6 +91,7 @@ $transactions = $stmt->fetchAll();
         <div class="col-lg-3">
             <div class="glass-card p-4 h-100">
                 <nav class="nav flex-column gap-2">
+
                     <a href="dashboard.php" class="sidebar-link">
                         <i class="fa-solid fa-chart-line"></i> Dashboard
                     </a>
@@ -105,6 +111,7 @@ $transactions = $stmt->fetchAll();
                     <a href="profile.php" class="sidebar-link">
                         <i class="fa-solid fa-user-gear"></i> Settings
                     </a>
+
                 </nav>
             </div>
         </div>
@@ -118,6 +125,7 @@ $transactions = $stmt->fetchAll();
             <div class="row g-4 mb-4">
                 <div class="col-md-12">
                     <div class="glass-card p-5 text-center">
+
                         <span class="text-muted small fw-bold text-uppercase">
                             Total Lifetime Earnings
                         </span>
@@ -129,16 +137,22 @@ $transactions = $stmt->fetchAll();
                         <p class="text-muted small mt-2 mb-0">
                             Total revenue generated from all confirmed bookings
                         </p>
+
                     </div>
                 </div>
             </div>
 
             <!-- Monthly Revenue -->
             <div class="glass-card p-4 mb-4">
-                <h5 class="fw-bold mb-4">Monthly Revenue (Last 6 Months)</h5>
+
+                <h5 class="fw-bold mb-4">
+                    Monthly Revenue (Last 6 Months)
+                </h5>
 
                 <div class="table-responsive">
+
                     <table class="table table-hover align-middle">
+
                         <thead class="bg-light">
                             <tr>
                                 <th>Month</th>
@@ -147,18 +161,21 @@ $transactions = $stmt->fetchAll();
                         </thead>
 
                         <tbody>
+
                             <?php if (!empty($monthly_data)): ?>
-                                
+
                                 <?php foreach ($monthly_data as $data): ?>
 
                                     <tr>
+
                                         <td>
-                                            <?php echo $data['month']; ?>
+                                            <?php echo htmlspecialchars($data['month']); ?>
                                         </td>
 
                                         <td class="fw-bold text-success">
                                             ₹<?php echo number_format($data['revenue']); ?>
                                         </td>
+
                                     </tr>
 
                                 <?php endforeach; ?>
@@ -172,15 +189,21 @@ $transactions = $stmt->fetchAll();
                                 </tr>
 
                             <?php endif; ?>
+
                         </tbody>
+
                     </table>
+
                 </div>
+
             </div>
 
             <!-- Recent Transactions -->
             <div class="glass-card p-4">
 
-                <h5 class="fw-bold mb-4">Recent Transactions</h5>
+                <h5 class="fw-bold mb-4">
+                    Recent Transactions
+                </h5>
 
                 <div class="table-responsive">
 
@@ -249,6 +272,7 @@ $transactions = $stmt->fetchAll();
             </div>
 
         </div>
+
     </div>
 </div>
 
