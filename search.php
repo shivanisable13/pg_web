@@ -4,6 +4,7 @@ require_once 'includes/header.php';
 require_once 'includes/config/db.php';
 
 // Get Filters
+
 $city = isset($_GET['city']) ? sanitize($_GET['city']) : '';
 $gender = isset($_GET['gender']) ? sanitize($_GET['gender']) : '';
 $min_price = isset($_GET['min_price']) ? (float)$_GET['min_price'] : 0;
