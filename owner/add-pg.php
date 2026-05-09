@@ -34,11 +34,11 @@ $all_amenities = $amenities_stmt->fetchAll();
                         <h5 class="fw-bold mb-4 border-bottom pb-2">Basic Information</h5>
                         <div class="mb-3">
                             <label class="form-label fw-semibold">PG Name / Title</label>
-                            <input type="text" name="title" class="form-control" placeholder="e.g. Royal Luxury PG for Gents" required>
+                            <input type="text" name="title" class="form-control" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Description</label>
-                            <textarea name="description" class="form-control" rows="5" placeholder="Tell us about your PG, rules, and nearby landmarks..." required></textarea>
+                            <textarea name="description" class="form-control" rows="5"  required></textarea>
                         </div>
                         <div class="row g-3">
                             <div class="col-md-6">
@@ -155,7 +155,7 @@ $all_amenities = $amenities_stmt->fetchAll();
                             <i class="fa-solid fa-circle-info me-2"></i> Your listing will be reviewed by admins before going live.
                         </div>
                         <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold mb-3 shadow">Submit for Approval</button>
-                        <button type="button" class="btn btn-outline-secondary w-100 rounded-pill py-2">Save as Draft</button>
+                        
                     </div>
                 </div>
             </form>
