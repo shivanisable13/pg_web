@@ -4,7 +4,6 @@ $pageTitle = "Find PG Accommodation";
 require_once 'includes/header.php';
 require_once 'includes/config/db.php';
 
-
 // Fetch Featured PGs
 $stmt = $pdo->query("
     SELECT 
