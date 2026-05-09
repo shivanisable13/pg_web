@@ -33,7 +33,7 @@ $featuredPGs = $stmt->fetchAll();
             <div class="col-lg-6 mb-5 mb-lg-0 fade-in">
 
                 <h1 class="display-2 fw-bold">
-                    Find Your Perfect
+                    
                     <span class="text-primary d-block">
                         Home Away From Home
                     </span>
