@@ -64,11 +64,11 @@ $all_amenities = $amenities_stmt->fetchAll();
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">City</label>
-                                <input type="text" name="city" class="form-control" placeholder="Bangalore" required>
+                                <input type="text" name="city" class="form-control"  required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Area</label>
-                                <input type="text" name="area" class="form-control" placeholder="HSR Layout" required>
+                                <input type="text" name="area" class="form-control"  required>
                             </div>
                             <div class="col-12">
                                 <label class="form-label fw-semibold">Full Address</label>
@@ -80,7 +80,7 @@ $all_amenities = $amenities_stmt->fetchAll();
                             </div>
                             <div class="col-md-8">
                                 <label class="form-label fw-semibold">Nearby University/Colleges</label>
-                                <input type="text" name="university_nearby" class="form-control" placeholder="Christ University, NIFT, etc.">
+                                <input type="text" name="university_nearby" class="form-control">
                             </div>
                         </div>
                     </div>
