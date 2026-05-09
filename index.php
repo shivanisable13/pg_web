@@ -87,7 +87,7 @@ $featuredPGs = $stmt->fetchAll();
             <div class="col-lg-6 text-center fade-in">
 
                 <img 
-                    src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1200&auto=format&fit=crop"
+                    src="https://www.magicbricks.com/paying-guest-for-boys-in-belgaum-pppfr"
                     class="img-fluid rounded-5 shadow-lg"
                     alt="Luxury PG"
                     style="max-height:650px; object-fit:cover;"
