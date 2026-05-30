@@ -17,7 +17,7 @@ require_once '../includes/header.php';
                         <label class="form-label fw-semibold">Email Address</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-envelope text-muted"></i></span>
-                            <input type="email" name="email" class="form-control border-start-0" placeholder="john@example.com" required>
+                            <input type="email" name="email" class="form-control border-start-0" required>
                         </div>
                     </div>
 
