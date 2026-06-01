@@ -130,6 +130,25 @@ $all_amenities = $amenities_stmt->fetchAll();
                             <label class="form-label fw-semibold">Other Images (Multiple)</label>
                             <input type="file" name="other_images[]" class="form-control" accept="image/*" multiple>
                         </div>
+                        <div class="mb-4 border-top pt-3">
+                            <label class="form-label fw-bold text-danger"><i class="fa-solid fa-file-shield me-1"></i> Verification Documents</label>
+                            <p class="text-muted small mb-3">Please upload a document to verify property ownership for faster approval.</p>
+                            
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">Document Type</label>
+                                <select name="document_type" class="form-select form-select-sm">
+                                    <option value="tax_receipt">Property Tax Receipt</option>
+                                    <option value="utility_bill">Utility Bill (Electricity/Water)</option>
+                                    <option value="owner_id">Owner ID (Aadhar/PAN)</option>
+                                    <option value="other">Other Legal Document</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-0">
+                                <label class="form-label small fw-semibold">Upload Document (PDF/Image)</label>
+                                <input type="file" name="verification_doc" class="form-control form-control-sm" accept=".pdf,image/*" required>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Amenities -->
