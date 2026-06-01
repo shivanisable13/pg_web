@@ -64,7 +64,7 @@ $pending_pgs = $stmt->fetchAll();
                             <?php echo substr($pg['description'], 0, 150); ?>...
                         </div>
                         
-                        <?php if($pg['verification_doc']): ?>
+                        <?php if(!empty($pg['verification_doc'])): ?>
                         <div class="mt-3">
                             <?php 
                             $type_labels = [
@@ -73,7 +73,8 @@ $pending_pgs = $stmt->fetchAll();
                                 'owner_id' => 'Owner ID',
                                 'other' => 'Legal Document'
                             ];
-                            $label = $type_labels[$pg['verification_doc_type']] ?? 'Document';
+                            $doc_type = $pg['verification_doc_type'] ?? '';
+                            $label = $type_labels[$doc_type] ?? 'Document';
                             ?>
                             <p class="mb-2 small"><strong>Required:</strong> <span class="text-primary"><?php echo $label; ?></span></p>
                             <a href="<?php echo getImageUrl($pg['verification_doc']); ?>" target="_blank" class="btn btn-sm btn-light border text-danger fw-bold rounded-pill px-3">
