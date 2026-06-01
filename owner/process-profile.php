@@ -2,26 +2,28 @@
 require_once '../includes/config/db.php';
 require_once '../includes/config/config.php';
 require_once '../includes/functions.php';
-
 if (!isLoggedIn() || !hasRole('owner')) redirect('/auth/login.php');
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = $_SESSION['user_id'];
     $full_name = sanitize($_POST['full_name']);
     $phone = sanitize($_POST['phone']);
     $new_password = $_POST['new_password'];
-
+    
+    $payment_upi_id = sanitize($_POST['payment_upi_id']);
+    $payment_bank_name = sanitize($_POST['payment_bank_name']);
+    $payment_account_number = sanitize($_POST['payment_account_number']);
+    $payment_ifsc_code = sanitize($_POST['payment_ifsc_code']);
     try {
         $stmt = $pdo->prepare("UPDATE users SET full_name = ?, phone = ? WHERE id = ?");
         $stmt->execute([$full_name, $phone, $user_id]);
+        $stmt = $pdo->prepare("UPDATE users SET full_name = ?, phone = ?, payment_upi_id = ?, payment_bank_name = ?, payment_account_number = ?, payment_ifsc_code = ? WHERE id = ?");
+        $stmt->execute([$full_name, $phone, $payment_upi_id, $payment_bank_name, $payment_account_number, $payment_ifsc_code, $user_id]);
         $_SESSION['user_name'] = $full_name;
-
         if (!empty($new_password)) {
             $hashed = password_hash($new_password, PASSWORD_DEFAULT);
             $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
             $stmt->execute([$hashed, $user_id]);
         }
-
         if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === 0) {
             $img_url = uploadImage($_FILES['profile_image'], 'uploads/profiles/');
             if ($img_url) {
@@ -30,10 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['user_image'] = $img_url;
             }
         }
-
         setFlash('success', 'Account updated successfully.');
         redirect('/owner/profile.php');
-
     } catch (PDOException $e) {
         setFlash('danger', 'Error updating account.');
         redirect('/owner/profile.php');
