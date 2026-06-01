@@ -31,6 +31,8 @@ CREATE TABLE IF NOT EXISTS pg_listings (
     university_nearby VARCHAR(255),
     gender_allowed ENUM('male', 'female', 'both') NOT NULL,
     property_type ENUM('pg', 'hostel', 'flat') DEFAULT 'pg',
+    verification_doc VARCHAR(255) NULL,
+    verification_doc_type VARCHAR(50) NULL,
     lat DECIMAL(10,8),
     lng DECIMAL(11,8),
     status ENUM('pending', 'approved', 'rejected', 'hidden') DEFAULT 'pending',
