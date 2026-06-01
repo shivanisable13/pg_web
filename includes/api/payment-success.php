@@ -2,22 +2,18 @@
 require_once '../config/db.php';
 require_once '../config/config.php';
 require_once '../functions.php';
-
 if (!isLoggedIn()) redirect('/auth/login.php');
-
 $booking_id = isset($_GET['booking_id']) ? (int)$_GET['booking_id'] : 0;
 $payment_id = isset($_GET['razorpay_payment_id']) ? sanitize($_GET['razorpay_payment_id']) : '';
-
 if (empty($booking_id) || empty($payment_id)) {
     setFlash('danger', 'Invalid payment details.');
     redirect('/index.php');
 }
-
 try {
     $pdo->beginTransaction();
-
     // 1. Fetch Detailed Booking Info for Email
     $stmt = $pdo->prepare("SELECT b.*, r.room_type, p.title as pg_title, p.address as pg_address, u.email as user_email, u.full_name as user_name 
+    $stmt = $pdo->prepare("SELECT b.*, r.room_type, p.title as pg_title, p.address as pg_address, p.owner_id as owner_id, u.email as user_email, u.full_name as user_name 
                           FROM bookings b 
                           JOIN rooms r ON b.room_id = r.id 
                           JOIN pg_listings p ON b.pg_id = p.id
@@ -25,26 +21,24 @@ try {
                           WHERE b.id = ?");
     $stmt->execute([$booking_id]);
     $booking = $stmt->fetch();
-
     if ($booking && $booking['payment_status'] === 'unpaid') {
         // 2. Update Booking Status
         $stmt = $pdo->prepare("UPDATE bookings SET status = 'confirmed', payment_status = 'paid' WHERE id = ?");
         $stmt->execute([$booking_id]);
-
         // 3. Record Payment
         $stmt = $pdo->prepare("INSERT INTO payments (booking_id, transaction_id, amount, payment_method, payment_status) VALUES (?, ?, ?, 'Razorpay', 'captured')");
         $stmt->execute([$booking_id, $payment_id, $booking['total_amount']]);
-
         // 4. Reduce Room Availability
         $stmt = $pdo->prepare("UPDATE rooms SET available_beds = available_beds - 1 WHERE id = ?");
         $stmt->execute([$booking['room_id']]);
-
         // 5. Create Notification for User
         $stmt = $pdo->prepare("INSERT INTO notifications (user_id, title, message, type) VALUES (?, 'Booking Confirmed!', 'Your booking for the PG has been confirmed successfully.', 'success')");
         $stmt->execute([$booking['user_id']]);
-
+        // Create Notification for Owner
+        $ownerMessage = "User {$booking['user_name']} has booked a room (" . ucfirst($booking['room_type']) . " Sharing) in your PG '{$booking['pg_title']}'. A payment of ₹" . number_format($booking['total_amount']) . " was made via Razorpay. Transaction ID: $payment_id.";
+        $stmt = $pdo->prepare("INSERT INTO notifications (user_id, title, message, type) VALUES (?, 'New Booking & Payment Received', ?, 'info')");
+        $stmt->execute([$booking['owner_id'], $ownerMessage]);
         $pdo->commit();
-
         // 6. Send Confirmation Email
         $subject = "Booking Confirmed - " . $booking['pg_title'];
         $move_out = new DateTime($booking['move_in_date']);
@@ -93,7 +87,6 @@ try {
                 <a href='" . APP_URL . "/user/booking-details.php?id={$booking_id}' style='background: #4f46e5; color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 50px; font-weight: bold; display: inline-block; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);'>Download Digital Receipt</a>
             </div>
         ";
-
         sendEmail($booking['user_email'], $subject, $emailContent);
         
         setFlash('success', 'Payment successful! A confirmation email has been sent to ' . $booking['user_email']);
@@ -102,7 +95,6 @@ try {
         $pdo->rollBack();
         redirect('/user/bookings.php');
     }
-
 } catch (Exception $e) {
     $pdo->rollBack();
     setFlash('danger', 'Error processing payment: ' . $e->getMessage());
