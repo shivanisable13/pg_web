@@ -28,13 +28,13 @@ $all_amenities = $amenities_stmt->fetchAll();
             </div>
 
             <form action="process-add-pg.php" method="POST" enctype="multipart/form-data" class="row g-4">
-                <!-- Basic Information >
+                <!-- Basic Information -->
                 <div class="col-md-8">
                     <div class="glass-card p-4 mb-4">
                         <h5 class="fw-bold mb-4 border-bottom pb-2">Basic Information</h5>
                         <div class="mb-3">
                             <label class="form-label fw-semibold">PG Name / Title</label>
-                            <input type="text" name="title" class="form-control" placeholder="e.g. Royal Luxury PG " required>
+                            <input type="text" name="title" class="form-control" placeholder="e.g. Royal Luxury PG for Gents" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Description</label>
