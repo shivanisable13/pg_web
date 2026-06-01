@@ -16,6 +16,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect('/auth/register.php');
     }
 
+    if (!preg_match('/^[0-9]{10}$/', $phone)) {
+        setFlash('danger', 'Phone number must be exactly 10 digits.');
+        redirect('/auth/register.php');
+    }
+
     // Check if email or phone already exists
     $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ? OR phone = ?");
     $stmt->execute([$email, $phone]);

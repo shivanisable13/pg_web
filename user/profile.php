@@ -61,8 +61,31 @@ $user = $stmt->fetch();
                             <h5 class="fw-bold mb-3">Change Password</h5>
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">New Password</label>
-                                <input type="password" name="new_password" class="form-control" placeholder="Leave blank to keep current">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-lock text-muted"></i></span>
+                                    <input type="password" name="new_password" id="new_password" class="form-control border-start-0 border-end-0" placeholder="Leave blank to keep current">
+                                    <span class="input-group-text bg-light border-start-0 cursor-pointer" id="togglePassword">
+                                        <i class="fa-solid fa-eye text-muted"></i>
+                                    </span>
+                                </div>
                             </div>
+
+                            <script>
+                            document.getElementById('togglePassword').addEventListener('click', function() {
+                                const passwordInput = document.getElementById('new_password');
+                                const icon = this.querySelector('i');
+                                
+                                if (passwordInput.type === 'password') {
+                                    passwordInput.type = 'text';
+                                    icon.classList.remove('fa-eye');
+                                    icon.classList.add('fa-eye-slash');
+                                } else {
+                                    passwordInput.type = 'password';
+                                    icon.classList.remove('fa-eye-slash');
+                                    icon.classList.add('fa-eye');
+                                }
+                            });
+                            </script>
                             
                             <button type="submit" class="btn btn-primary rounded-pill px-5 py-3 fw-bold mt-3">Update Profile</button>
                         </div>

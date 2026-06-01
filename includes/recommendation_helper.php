@@ -8,7 +8,7 @@
 function getRecommendedPGs($pdo, $user_id = null) {
     if (!$user_id) {
         // Fallback for guests: Trending PGs (highest rated)
-        $stmt = $pdo->query("SELECT p.*, pi.image_url, MIN(r.rent_per_month) as min_rent 
+        $stmt = $pdo->query("SELECT p.*, MAX(pi.image_url) as image_url, MIN(r.rent_per_month) as min_rent 
                             FROM pg_listings p 
                             LEFT JOIN pg_images pi ON p.id = pi.pg_id AND pi.is_featured = 1
                             LEFT JOIN rooms r ON p.id = r.pg_id
@@ -27,7 +27,7 @@ function getRecommendedPGs($pdo, $user_id = null) {
 
     if ($last_city) {
         // Recommend in the same city
-        $stmt = $pdo->prepare("SELECT p.*, pi.image_url, MIN(r.rent_per_month) as min_rent 
+        $stmt = $pdo->prepare("SELECT p.*, MAX(pi.image_url) as image_url, MIN(r.rent_per_month) as min_rent 
                               FROM pg_listings p 
                               LEFT JOIN pg_images pi ON p.id = pi.pg_id AND pi.is_featured = 1
                               LEFT JOIN rooms r ON p.id = r.pg_id

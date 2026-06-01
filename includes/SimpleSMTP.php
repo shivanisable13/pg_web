@@ -14,6 +14,7 @@ class SimpleSMTP {
             return false;
         }
 
+        
         $response = fgets($socket, 512);
 
         // HELO

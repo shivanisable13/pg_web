@@ -5,17 +5,25 @@ require_once 'includes/functions.php';
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-// Fetch PG Details
+// Fetch PG Details (Allow admins and owners to see non-approved listings)
 $stmt = $pdo->prepare("SELECT p.*, u.full_name as owner_name, u.phone as owner_phone, u.profile_image as owner_image 
                       FROM pg_listings p 
                       JOIN users u ON p.owner_id = u.id 
-                      WHERE p.id = ? AND p.status = 'approved'");
+                      WHERE p.id = ?");
 $stmt->execute([$id]);
 $pg = $stmt->fetch();
 
 if (!$pg) {
-    setFlash('danger', 'PG not found or not approved.');
+    setFlash('danger', 'Property not found.');
     redirect('/search.php');
+}
+
+// Security Check: Only admins or owners can see non-approved properties
+if ($pg['status'] !== 'approved') {
+    if (!isLoggedIn() || (!hasRole('admin') && $_SESSION['user_id'] != $pg['owner_id'])) {
+        setFlash('danger', 'This property listing is currently pending approval.');
+        redirect('/search.php');
+    }
 }
 
 $pageTitle = $pg['title'];
@@ -152,14 +160,19 @@ $rooms = $stmt->fetchAll();
                             <input type="hidden" name="pg_id" value="<?php echo $pg['id']; ?>">
                             
                             <div class="mb-4">
-                                <?php foreach($rooms as $room): ?>
+                                <?php foreach($rooms as $index => $room): ?>
                                 <div class="form-check p-0 mb-3">
-                                    <input type="radio" class="btn-check room-selector" name="room_id" id="room-<?php echo $room['id']; ?>" value="<?php echo $room['id']; ?>" data-rent="<?php echo $room['rent_per_month']; ?>" required>
-                                    <label class="btn btn-outline-light text-dark w-100 text-start p-3 rounded-4 border" for="room-<?php echo $room['id']; ?>">
+                                    <input type="radio" class="btn-check room-selector" name="room_id" id="room-<?php echo $room['id']; ?>" value="<?php echo $room['id']; ?>" data-rent="<?php echo $room['rent_per_month']; ?>" required <?php echo $index === 0 ? 'checked' : ''; ?>>
+                                    <label class="btn btn-outline-primary bg-white text-dark w-100 text-start p-3 rounded-4 border-2 shadow-sm plan-card" for="room-<?php echo $room['id']; ?>">
                                         <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <span class="fw-bold d-block"><?php echo ucfirst($room['room_type']); ?> Sharing</span>
-                                                <span class="small text-muted"><?php echo $room['available_beds']; ?> beds left</span>
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div class="icon-box-sm bg-primary-light text-primary rounded-3">
+                                                    <i class="fa-solid fa-bed"></i>
+                                                </div>
+                                                <div>
+                                                    <span class="fw-bold d-block"><?php echo ucfirst($room['room_type']); ?> Sharing</span>
+                                                    <span class="small text-muted"><?php echo $room['available_beds']; ?> beds left</span>
+                                                </div>
                                             </div>
                                             <div class="text-end">
                                                 <span class="h5 fw-bold text-primary mb-0">₹<?php echo number_format($room['rent_per_month']); ?></span>
@@ -173,7 +186,7 @@ $rooms = $stmt->fetchAll();
 
                             <div class="mb-3">
                                 <label class="form-label small fw-bold">Move-in Date</label>
-                                <input type="date" name="move_in_date" class="form-control" required min="<?php echo date('Y-m-d'); ?>">
+                                <input type="date" name="move_in_date" class="form-control" value="<?php echo date('Y-m-d'); ?>" required min="<?php echo date('Y-m-d'); ?>">
                             </div>
 
                             <div class="mb-4">
@@ -284,6 +297,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     durationSelector.addEventListener('change', updateSummary);
     moveInInput.addEventListener('change', updateSummary);
+
+    // Run once on load to show summary for pre-selected room
+    updateSummary();
 });
 </script>
 

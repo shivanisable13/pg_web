@@ -1,84 +1,136 @@
-version: '3.8'
+version: '3.9'
 
 # ============================================================
-# Docker Compose for CampusStay
-# Services: PHP+Apache App, MySQL Database, phpMyAdmin
+# CampusStay Production Docker Compose
+# PHP + Apache + MySQL + phpMyAdmin
 # ============================================================
 
 services:
 
-  # ── PHP + Apache Application ──────────────────────────────
+
+  # ==========================================================
+  # PHP + APACHE APPLICATION
+  # ==========================================================
   app:
+
     build:
       context: .
       dockerfile: Dockerfile
+
     container_name: campusstay_app
-    restart: unless-stopped
+
+    restart: always
+
     ports:
-      - "8080:80"         # Access app at http://localhost:8080
-    volumes:
-      - .:/var/www/html   # Live code sync (dev mode)
-      - uploads_data:/var/www/html/uploads
+      - "80:80"
+
     environment:
-      - DB_HOST=db
-      - DB_NAME=campus_stay
-      - DB_USER=campusstay_user
-      - DB_PASS=CampusStay@2024
-      - APP_ENV=production
+      DB_HOST: db
+      DB_NAME: campusstay
+      DB_USER: campusstay_user
+      DB_PASS: CampusStay2024
+      APP_ENV: production
+
     depends_on:
       db:
         condition: service_healthy
+
+    volumes:
+      - uploads_data:/var/www/html/uploads
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
     networks:
       - campusstay_network
 
-  # ── MySQL Database ────────────────────────────────────────
+  # ==========================================================
+  # MYSQL DATABASE
+  # ==========================================================
   db:
+
     image: mysql:8.0
+
     container_name: campusstay_db
-    restart: unless-stopped
+
+    restart: always
+
     environment:
-      MYSQL_DATABASE: campus_stay
+      MYSQL_DATABASE: campusstay
       MYSQL_USER: campusstay_user
-      MYSQL_PASSWORD: CampusStay@2024
-      MYSQL_ROOT_PASSWORD: RootPass@2024
+      MYSQL_PASSWORD: CampusStay2024
+      MYSQL_ROOT_PASSWORD: RootPass2024
+
+    command:
+      --default-authentication-plugin=mysql_native_password
+
     ports:
-      - "3307:3306"       # Exposed on 3307 to avoid conflict with local MySQL
+      - "3307:3306"
+
     volumes:
       - db_data:/var/lib/mysql
-      - ./database/campus_stay.sql:/docker-entrypoint-initdb.d/init.sql:ro  # Auto-import schema
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pRootPass@2024"]
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-pRootPass2024"
+        ]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+
     networks:
       - campusstay_network
 
-  # ── phpMyAdmin (Database GUI) ─────────────────────────────
+  # ==========================================================
+  # PHPMYADMIN
+  # ==========================================================
   phpmyadmin:
+
     image: phpmyadmin:latest
+
     container_name: campusstay_phpmyadmin
-    restart: unless-stopped
-    ports:
-      - "8081:80"         # Access phpMyAdmin at http://localhost:8081
-    environment:
-      PMA_HOST: db
-      PMA_USER: campusstay_user
-      PMA_PASSWORD: CampusStay@2024
-      MYSQL_ROOT_PASSWORD: RootPass@2024
+
+    restart: always
+
     depends_on:
       - db
+
+    ports:
+      - "8081:80"
+
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: RootPass2024
+
     networks:
       - campusstay_network
 
-# ── Persistent Volumes ────────────────────────────────────────
+# ============================================================
+# PERSISTENT VOLUMES
+# ============================================================
+
 volumes:
   db_data:
-    driver: local
   uploads_data:
-    driver: local
 
-# ── Network ───────────────────────────────────────────────────
+# ============================================================
+# NETWORK
+# ============================================================
+
 networks:
   campusstay_network:
     driver: bridge

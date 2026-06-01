@@ -119,15 +119,7 @@ $total_revenue = $total_revenue->fetchColumn() ?? 0;
                                     <p class="text-muted small mb-0">Broadcast messages to all your tenants.</p>
                                 </a>
                             </div>
-                            <div class="col-md-4">
-                                <a href="support-chat.php" class="btn btn-light text-start border rounded-4 p-4 h-100 d-block text-decoration-none hover-translate">
-                                    <div class="icon-box bg-success-light text-success mb-3">
-                                        <i class="fa-solid fa-headset"></i>
-                                    </div>
-                                    <h6 class="fw-bold text-dark">Support Desk</h6>
-                                    <p class="text-muted small mb-0">Chat with administrators or view tickets.</p>
-                                </a>
-                            </div>
+
                         </div>
                     </div>
                 </div>

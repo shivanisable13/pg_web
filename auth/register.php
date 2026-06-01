@@ -33,17 +33,42 @@ require_once '../includes/header.php';
                         <label class="form-label fw-semibold">Phone Number</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-phone text-muted"></i></span>
-                            <input type="tel" name="phone" class="form-control border-start-0" placeholder="+91 98765 43210" required>
+                            <input type="tel" name="phone" id="phone" class="form-control border-start-0" 
+                                   placeholder="9876543210" required 
+                                   pattern="[0-9]{10}" 
+                                   maxlength="10" 
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                         </div>
+                        <div class="form-text small">Please enter your 10-digit mobile number.</div>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Password</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-lock text-muted"></i></span>
-                            <input type="password" name="password" class="form-control border-start-0" placeholder="••••••••" required minlength="8">
+                            <input type="password" name="password" id="password" class="form-control border-start-0 border-end-0" placeholder="••••••••" required minlength="8">
+                            <span class="input-group-text bg-light border-start-0 cursor-pointer" id="togglePassword">
+                                <i class="fa-solid fa-eye text-muted"></i>
+                            </span>
                         </div>
                     </div>
+
+                    <script>
+                    document.getElementById('togglePassword').addEventListener('click', function() {
+                        const passwordInput = document.getElementById('password');
+                        const icon = this.querySelector('i');
+                        
+                        if (passwordInput.type === 'password') {
+                            passwordInput.type = 'text';
+                            icon.classList.remove('fa-eye');
+                            icon.classList.add('fa-eye-slash');
+                        } else {
+                            passwordInput.type = 'password';
+                            icon.classList.remove('fa-eye-slash');
+                            icon.classList.add('fa-eye');
+                        }
+                    });
+                    </script>
 
                     <div class="mb-4">
                         <label class="form-label fw-semibold">I am a...</label>
