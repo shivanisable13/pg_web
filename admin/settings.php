@@ -13,18 +13,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $auto_approval = isset($_POST['auto_approval']) ? '1' : '0';
     $maintenance = isset($_POST['maintenance_mode']) ? '1' : '0';
 
-    updateSetting('commission_percent', $commission);
+    updateSetting('commission_percentage', $commission);
     updateSetting('booking_token', $token);
-    updateSetting('auto_approval', $auto_approval);
+    updateSetting('allow_automatic_approval', $auto_approval);
     updateSetting('maintenance_mode', $maintenance);
 
     setFlash('success', 'System settings updated successfully.');
 }
 
 // Fetch Current Settings
-$commission = getSetting('commission_percent', '10');
+$commission = getSetting('commission_percentage', '10');
 $token = getSetting('booking_token', '500');
-$auto_approval = getSetting('auto_approval', '0');
+$auto_approval = getSetting('allow_automatic_approval', '0');
 $maintenance = getSetting('maintenance_mode', '0');
 
 require_once '../includes/header.php';
@@ -83,8 +83,6 @@ require_once '../includes/header.php';
                                 <?php echo $maintenance === '1' ? '<span class="text-danger">Enabled (Site Offline)</span>' : '<span class="text-success">Disabled (Site Live)</span>'; ?>
                             </label>
                         </div>
-                        <div class="form-text ps-5">When enabled, only administrators can access the front-end.</div>
-                    </div>
                         <div class="form-text ps-5">When enabled, only administrators can access the front-end.</div>
                     </div>
                 </div>

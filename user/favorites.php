@@ -15,7 +15,7 @@ $user_id = $_SESSION['user_id'];
 // Fetch Saved PGs (Handling case where table might not exist yet)
 $favorites = [];
 try {
-    $stmt = $pdo->prepare("SELECT p.*, pi.image_url, MIN(r.rent_per_month) as min_rent 
+    $stmt = $pdo->prepare("SELECT p.*, MAX(pi.image_url) as image_url, MIN(r.rent_per_month) as min_rent 
                           FROM favorites f
                           JOIN pg_listings p ON f.pg_id = p.id
                           LEFT JOIN pg_images pi ON p.id = pi.pg_id AND pi.is_featured = 1

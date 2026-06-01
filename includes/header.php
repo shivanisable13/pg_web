@@ -2,6 +2,23 @@
 // includes/header.php
 require_once __DIR__ . '/config/config.php';
 require_once __DIR__ . '/functions.php';
+
+// Maintenance Mode Check
+if (getSetting('maintenance_mode', '0') === '1' && !hasRole('admin')) {
+    // Check if we are not already on the login page (to allow admins to log in)
+    $current_page = basename($_SERVER['PHP_SELF']);
+    if ($current_page !== 'login.php') {
+        die("
+            <div style='font-family: sans-serif; text-align: center; padding: 100px;'>
+                <h1 style='color: #4f46e5;'>Site Under Maintenance</h1>
+                <p style='color: #64748b;'>We are currently performing scheduled maintenance. Please check back soon.</p>
+                <div style='margin-top: 20px;'>
+                    <a href='".APP_URL."/auth/login.php' style='color: #94a3b8; text-decoration: none; font-size: 12px;'>Admin Login</a>
+                </div>
+            </div>
+        ");
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">

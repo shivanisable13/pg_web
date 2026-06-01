@@ -79,6 +79,48 @@ h1, h2, h3, h4, h5, h6 {
     letter-spacing: -0.02em;
 }
 
+/* Hero Image Enhancements */
+.hero-image-container {
+    padding-bottom: 50px;
+}
+
+.main-hero-img {
+    width: 90%;
+    height: 500px;
+    object-fit: cover;
+    z-index: 1;
+    position: relative;
+}
+
+.floating-img {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 250px;
+    z-index: 2;
+    border: 8px solid var(--white-color);
+    animation: floating 3s ease-in-out infinite;
+}
+
+.hero-stats-card {
+    position: absolute;
+    top: 20%;
+    left: -15%;
+    z-index: 3;
+    min-width: 180px;
+    animation: floating 4s ease-in-out infinite reverse;
+}
+
+.smaller {
+    font-size: 0.75rem;
+}
+
+@keyframes floating {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+    100% { transform: translateY(0px); }
+}
+
 /* Glass Cards */
 .glass-card {
     background: var(--glass-bg);
@@ -196,6 +238,60 @@ footer {
 .bg-gradient-dark {
     background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
 }
+
+.icon-box-sm {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.step-img-wrapper {
+    position: relative;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    height: 200px;
+}
+
+.step-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.glass-card:hover .step-img-wrapper img {
+    transform: scale(1.1);
+}
+
+.icon-box-overlap {
+    position: absolute;
+    bottom: -15px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1rem;
+    box-shadow: var(--shadow-lg);
+    z-index: 2;
+}
+
+.plan-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid #e5e7eb !important;
+}
+
+.btn-check:checked + .plan-card {
+    border-color: var(--primary-color) !important;
+    background-color: rgba(79, 70, 229, 0.05) !important;
+    transform: scale(1.02);
+}
+
 .object-fit-cover { object-fit: cover; }
 .hover-zoom img { transition: transform 0.5s ease; }
 .hover-zoom:hover img { transform: scale(1.1); }

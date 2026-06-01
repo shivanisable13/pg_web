@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = $_SESSION['user_id'];
     $full_name = sanitize($_POST['full_name']);
     $phone = sanitize($_POST['phone']);
-    $new_password = $_POST['new_password'];
+    $new_password = isset($_POST['new_password']) ? $_POST['new_password'] : '';
 
     try {
         // Update Info

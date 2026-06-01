@@ -50,14 +50,13 @@ $bookings = $stmt->fetchAll();
                                 <th class="ps-4">Student</th>
                                 <th>PG / Room</th>
                                 <th>Move-in Date</th>
-                                <th>Status</th>
-                              <th class="text-end pe-4">Action</th>
+                                <th class="text-end pe-4">Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (empty($bookings)): ?>
                             <tr>
-                                <td colspan="5" class="text-center py-5 text-muted">No bookings found.</td>
+                                <td colspan="4" class="text-center py-5 text-muted">No bookings found.</td>
                             </tr>
                             <?php else: ?>
                                 <?php foreach ($bookings as $b): ?>
@@ -86,17 +85,7 @@ $bookings = $stmt->fetchAll();
                                             </div>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="text-end pe-4">
-                                        <div class="dropdown">
-                                            <button class="btn btn-sm btn-light rounded-circle" data-bs-toggle="dropdown">
-                                                <i class="fa-solid fa-ellipsis-vertical"></i>
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm">
-                                                <li><a class="dropdown-item" href="process-booking-status.php?id=<?php echo $b['id']; ?>&status=confirmed"><i class="fa-solid fa-check text-success me-2"></i> Confirm</a></li>
-                                                <li><a class="dropdown-item" href="process-booking-status.php?id=<?php echo $b['id']; ?>&status=cancelled"><i class="fa-solid fa-xmark text-danger me-2"></i> Cancel</a></li>
-                                            </ul>
-                                        </div>
-                                    </td>
+
                                 </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>

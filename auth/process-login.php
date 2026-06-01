@@ -4,12 +4,13 @@ require_once '../includes/config/config.php';
 require_once '../includes/functions.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = sanitize($_POST['email']);
-    $password = $_POST['password'];
+    $email = sanitize($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
 
     if (empty($email) || empty($password)) {
         setFlash('danger', 'Please enter email and password.');
         redirect('/auth/login.php');
+        exit;
     }
 
     $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
@@ -17,13 +18,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = $stmt->fetch();
 
     if ($user && password_verify($password, $user['password'])) {
-        if (!$user['is_verified']) {
+        // If user is not verified and not admin, require OTP verification
+        if (!$user['is_verified'] && $user['role'] !== 'admin') {
             $_SESSION['temp_user_id'] = $user['id'];
             setFlash('warning', 'Please verify your account first.');
             redirect('/auth/verify-otp.php');
+            exit;
         }
 
-        // Set Sessions
+        // Set session variables
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_name'] = $user['full_name'];
         $_SESSION['user_role'] = $user['role'];
@@ -39,11 +42,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             redirect('/user/dashboard.php');
         }
+        exit;
     } else {
         setFlash('danger', 'Invalid email or password.');
         redirect('/auth/login.php');
+        exit;
     }
 } else {
     redirect('/auth/login.php');
+    exit;
 }
 ?>

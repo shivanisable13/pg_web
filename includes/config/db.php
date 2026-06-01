@@ -17,6 +17,8 @@ try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
+    // Set MySQL Timezone to Indian Standard Time (IST)
     $pdo->exec("SET time_zone = '+05:30'");
 
 } catch (PDOException $e) {

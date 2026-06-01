@@ -50,3 +50,149 @@ Message:
             <p>This code will expire in 15 minutes. If you did not request this, please ignore this email.</p>
         
 -------------------
+Date: 2026-05-08 16:54:20
+To: shivanisable@rlsbca.edu.in
+Subject: Verify your CampusStay Account
+Message: 
+            <p>Hi <strong>Shivani Sable</strong>,</p>
+            <p>Thank you for joining CampusStay. To complete your registration, please use the OTP below:</p>
+            <div style='background: #f1f5f9; padding: 20px; text-align: center; border-radius: 8px; margin: 20px 0;'>
+                <span style='font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #4f46e5;'>883521</span>
+            </div>
+            <p>This code will expire in 15 minutes.</p>
+        
+-------------------
+Date: 2026-05-08 22:45:01
+To: saipallau12@gmail.com
+Subject: Reset your CampusStay Password
+Message: 
+            <h2 style='color: #4f46e5;'>Password Reset Request</h2>
+            <p>Hi <strong>geeta yellurkar</strong>,</p>
+            <p>We received a request to reset your password. Please use the verification code below to proceed:</p>
+            <div style='background: #f1f5f9; padding: 20px; text-align: center; border-radius: 12px; margin: 25px 0;'>
+                <span style='font-size: 32px; font-weight: 800; letter-spacing: 5px; color: #4f46e5;'>539543</span>
+            </div>
+            <p>This code will expire in 15 minutes. If you did not request this, please ignore this email.</p>
+        
+-------------------
+Date: 2026-05-09 00:01:26
+To: saipallau12@gmail.com
+Subject: Reset your CampusStay Password
+Message: 
+            <h2 style='color: #4f46e5;'>Password Reset Request</h2>
+            <p>Hi <strong>geeta yellurkar</strong>,</p>
+            <p>We received a request to reset your password. Please use the verification code below to proceed:</p>
+            <div style='background: #f1f5f9; padding: 20px; text-align: center; border-radius: 12px; margin: 25px 0;'>
+                <span style='font-size: 32px; font-weight: 800; letter-spacing: 5px; color: #4f46e5;'>573847</span>
+            </div>
+            <p>This code will expire in 15 minutes. If you did not request this, please ignore this email.</p>
+        
+-------------------
+Date: 2026-05-09 00:01:31
+To: saipallau12@gmail.com
+Subject: Reset your CampusStay Password
+Message: 
+            <h2 style='color: #4f46e5;'>Password Reset Request</h2>
+            <p>Hi <strong>geeta yellurkar</strong>,</p>
+            <p>We received a request to reset your password. Please use the verification code below to proceed:</p>
+            <div style='background: #f1f5f9; padding: 20px; text-align: center; border-radius: 12px; margin: 25px 0;'>
+                <span style='font-size: 32px; font-weight: 800; letter-spacing: 5px; color: #4f46e5;'>497645</span>
+            </div>
+            <p>This code will expire in 15 minutes. If you did not request this, please ignore this email.</p>
+        
+-------------------
+Date: 2026-05-09 07:49:29
+To: sablelaxmi075@gmail.com
+Subject: Verify your CampusStay Account
+Message: 
+            <p>Hi <strong>Laxmi</strong>,</p>
+            <p>Thank you for joining CampusStay. To complete your registration, please use the OTP below:</p>
+            <div style='background: #f1f5f9; padding: 20px; text-align: center; border-radius: 8px; margin: 20px 0;'>
+                <span style='font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #4f46e5;'>342046</span>
+            </div>
+            <p>This code will expire in 15 minutes.</p>
+        
+-------------------
+Date: 2026-05-09 08:34:41
+To: 24p1280@students.git.edu
+Subject: Verify your CampusStay Account
+Message: 
+            <p>Hi <strong>pundlik</strong>,</p>
+            <p>Thank you for joining CampusStay. To complete your registration, please use the OTP below:</p>
+            <div style='background: #f1f5f9; padding: 20px; text-align: center; border-radius: 8px; margin: 20px 0;'>
+                <span style='font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #4f46e5;'>835306</span>
+            </div>
+            <p>This code will expire in 15 minutes.</p>
+        
+-------------------
+Date: 2026-05-09 08:41:43
+To: 24p1280@students.git.edu
+Subject: Booking Confirmed - tulja nivas
+Message: 
+            <div style='text-align: center; margin-bottom: 20px;'>
+                <div style='display: inline-block; padding: 10px 20px; background: #ecfdf5; color: #059669; border-radius: 50px; font-weight: bold; font-size: 14px;'>Payment Successful</div>
+            </div>
+            <h2 style='color: #1e293b; margin-top: 0;'>Booking Confirmed!</h2>
+            <p>Hi <strong>pundlik</strong>,</p>
+            <p>Great news! Your booking at <strong>tulja nivas</strong> has been confirmed. Here is your stay summary:</p>
+            
+            <div style='background: #f8fafc; border: 1px solid #e2e8f0; padding: 25px; border-radius: 16px; margin: 25px 0;'>
+                <div style='margin-bottom: 15px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 15px;'>
+                    <span style='color: #64748b; font-size: 12px; text-uppercase;'>Booking ID</span><br>
+                    <strong style='font-size: 18px; color: #4f46e5;'>CS-9</strong>
+                </div>
+                <table style='width: 100%; font-size: 14px;'>
+                    <tr>
+                        <td style='padding: 5px 0; color: #64748b;'>Room Type</td>
+                        <td style='padding: 5px 0; text-align: right; font-weight: bold;'>Single Sharing</td>
+                    </tr>
+                    <tr>
+                        <td style='padding: 5px 0; color: #64748b;'>Move-in Date</td>
+                        <td style='padding: 5px 0; text-align: right; font-weight: bold;'>09 May, 2026</td>
+                    </tr>
+                    <tr>
+                        <td style='padding: 5px 0; color: #64748b;'>Move-out Date</td>
+                        <td style='padding: 5px 0; text-align: right; font-weight: bold;'>08 Aug, 2026</td>
+                    </tr>
+                    <tr>
+                        <td style='padding: 5px 0; color: #64748b;'>Duration</td>
+                        <td style='padding: 5px 0; text-align: right; font-weight: bold;'>3 Months</td>
+                    </tr>
+                    <tr>
+                        <td style='padding: 15px 0 5px 0; color: #1e293b; font-weight: bold; font-size: 16px;'>Amount Paid</td>
+                        <td style='padding: 15px 0 5px 0; text-align: right; font-weight: 800; color: #4f46e5; font-size: 18px;'>₹6,000</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <p style='color: #64748b; font-size: 14px;'>Please present this email or the digital receipt in your dashboard during check-in.</p>
+            
+            <div style='text-align: center; margin-top: 30px;'>
+                <a href='http://localhost/raj/user/booking-details.php?id=9' style='background: #4f46e5; color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 50px; font-weight: bold; display: inline-block; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);'>Download Digital Receipt</a>
+            </div>
+        
+-------------------
+Date: 2026-05-11 19:28:42
+To: saipallau12@gmail.com
+Subject: Verify your CampusStay Account
+Message: 
+            <p>Hi <strong>Sai</strong>,</p>
+            <p>Thank you for joining CampusStay. To complete your registration, please use the OTP below:</p>
+            <div style='background: #f1f5f9; padding: 20px; text-align: center; border-radius: 8px; margin: 20px 0;'>
+                <span style='font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #4f46e5;'>975135</span>
+            </div>
+            <p>This code will expire in 15 minutes.</p>
+        
+-------------------
+Date: 2026-05-23 15:13:21
+To: desainikita7899@gmail.com
+Subject: Verify your CampusStay Account
+Message: 
+            <p>Hi <strong>Shivani Sable</strong>,</p>
+            <p>Thank you for joining CampusStay. To complete your registration, please use the OTP below:</p>
+            <div style='background: #f1f5f9; padding: 20px; text-align: center; border-radius: 8px; margin: 20px 0;'>
+                <span style='font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #4f46e5;'>942265</span>
+            </div>
+            <p>This code will expire in 15 minutes.</p>
+        
+-------------------
