@@ -148,6 +148,32 @@ $recent_notifications = $stmt->fetchAll();
                     </div>
                 </div>
             </div>
+
+            <!-- Recent Notifications Feed -->
+            <?php if (!empty($recent_notifications)): ?>
+            <div class="glass-card p-4 mt-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold mb-0"><i class="fa-solid fa-bell text-primary me-2"></i>Recent Notifications</h5>
+                    <a href="notifications.php" class="btn btn-sm btn-outline-primary rounded-pill px-3">View All</a>
+                </div>
+                <div class="d-flex flex-column gap-3">
+                    <?php foreach ($recent_notifications as $note): ?>
+                    <div class="d-flex align-items-start gap-3 p-3 rounded-4 <?php echo $note['is_read'] ? 'bg-light' : 'bg-primary bg-opacity-10 border border-primary border-opacity-25'; ?>">
+                        <div class="icon-box flex-shrink-0 <?php echo $note['type'] === 'info' ? 'bg-primary-light text-primary' : 'bg-success-light text-success'; ?>" style="width: 40px; height: 40px; min-width: 40px; border-radius: 10px; font-size: 14px;">
+                            <i class="fa-solid <?php echo $note['type'] === 'info' ? 'fa-indian-rupee-sign' : 'fa-check'; ?>"></i>
+                        </div>
+                        <div class="flex-grow-1 overflow-hidden">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <h6 class="fw-bold mb-1 text-dark small"><?php echo $note['title']; ?></h6>
+                                <span class="text-muted" style="font-size: 11px; white-space: nowrap; padding-left: 8px;"><?php echo date('d M, h:i A', strtotime($note['created_at'])); ?></span>
+                            </div>
+                            <p class="text-muted mb-0 small text-truncate"><?php echo $note['message']; ?></p>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>
