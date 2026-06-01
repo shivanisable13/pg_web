@@ -63,6 +63,28 @@ $pending_pgs = $stmt->fetchAll();
                             <strong>Description Snippet:</strong><br>
                             <?php echo substr($pg['description'], 0, 150); ?>...
                         </div>
+                        
+                        <?php if($pg['verification_doc']): ?>
+                        <div class="mt-3">
+                            <?php 
+                            $type_labels = [
+                                'tax_receipt' => 'Property Tax Receipt',
+                                'utility_bill' => 'Utility Bill',
+                                'owner_id' => 'Owner ID',
+                                'other' => 'Legal Document'
+                            ];
+                            $label = $type_labels[$pg['verification_doc_type']] ?? 'Document';
+                            ?>
+                            <p class="mb-2 small"><strong>Required:</strong> <span class="text-primary"><?php echo $label; ?></span></p>
+                            <a href="<?php echo getImageUrl($pg['verification_doc']); ?>" target="_blank" class="btn btn-sm btn-light border text-danger fw-bold rounded-pill px-3">
+                                <i class="fa-solid fa-file-pdf me-1"></i> View <?php echo $label; ?>
+                            </a>
+                        </div>
+                        <?php else: ?>
+                        <div class="mt-3 text-muted small italic">
+                            <i class="fa-solid fa-triangle-exclamation me-1 text-warning"></i> No verification document uploaded.
+                        </div>
+                        <?php endif; ?>
                     </div>
                     <!-- Actions -->
                     <div class="col-md-3 d-flex flex-column justify-content-center gap-2">

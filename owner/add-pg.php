@@ -51,10 +51,8 @@ $all_amenities = $amenities_stmt->fetchAll();
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Property Type</label>
-                                <select name="property_type" class="form-select" required>
+                                <select name="property_type" class="form-select" required readonly>
                                     <option value="pg">PG</option>
-                                    <option value="hostel">Hostel</option>
-                                    <option value="flat">Shared Flat</option>
                                 </select>
                             </div>
                         </div>
@@ -98,7 +96,7 @@ $all_amenities = $amenities_stmt->fetchAll();
                                 <div class="row g-3">
                                     <div class="col-md-4">
                                         <label class="form-label small fw-bold">Room Type</label>
-                                        <select name="rooms[0][type]" class="form-select form-select-sm">
+                                        <select name="rooms[0][type]" class="form-select form-select-sm room-type-select">
                                             <option value="single">Single Sharing</option>
                                             <option value="double">Double Sharing</option>
                                             <option value="triple">Triple Sharing</option>
@@ -111,7 +109,7 @@ $all_amenities = $amenities_stmt->fetchAll();
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label small fw-bold">Total Beds</label>
-                                        <input type="number" name="rooms[0][beds]" class="form-control form-control-sm" required>
+                                        <input type="number" name="rooms[0][beds]" class="form-control form-control-sm beds-input" value="1" required>
                                     </div>
                                 </div>
                             </div>
@@ -131,6 +129,25 @@ $all_amenities = $amenities_stmt->fetchAll();
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Other Images (Multiple)</label>
                             <input type="file" name="other_images[]" class="form-control" accept="image/*" multiple>
+                        </div>
+                        <div class="mb-4 border-top pt-3">
+                            <label class="form-label fw-bold text-danger"><i class="fa-solid fa-file-shield me-1"></i> Verification Documents</label>
+                            <p class="text-muted small mb-3">Please upload a document to verify property ownership for faster approval.</p>
+                            
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">Document Type</label>
+                                <select name="document_type" class="form-select form-select-sm">
+                                    <option value="tax_receipt">Property Tax Receipt</option>
+                                    <option value="utility_bill">Utility Bill (Electricity/Water)</option>
+                                    <option value="owner_id">Owner ID (Aadhar/PAN)</option>
+                                    <option value="other">Other Legal Document</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-0">
+                                <label class="form-label small fw-semibold">Upload Document (PDF/Image)</label>
+                                <input type="file" name="verification_doc" class="form-control form-control-sm" accept=".pdf,image/*" required>
+                            </div>
                         </div>
                     </div>
 
@@ -157,7 +174,7 @@ $all_amenities = $amenities_stmt->fetchAll();
                             <i class="fa-solid fa-circle-info me-2"></i> Your listing will be reviewed by admins before going live.
                         </div>
                         <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold mb-3 shadow">Submit for Approval</button>
-                        <button type="button" class="btn btn-outline-secondary w-100 rounded-pill py-2">Save as Draft</button>
+
                     </div>
                 </div>
             </form>
@@ -176,7 +193,7 @@ document.getElementById('addRoomPlan').addEventListener('click', function() {
         <div class="row g-3">
             <div class="col-md-4">
                 <label class="form-label small fw-bold">Room Type</label>
-                <select name="rooms[${roomPlanCount}][type]" class="form-select form-select-sm">
+                <select name="rooms[${roomPlanCount}][type]" class="form-select form-select-sm room-type-select">
                     <option value="single">Single Sharing</option>
                     <option value="double">Double Sharing</option>
                     <option value="triple">Triple Sharing</option>
@@ -189,12 +206,32 @@ document.getElementById('addRoomPlan').addEventListener('click', function() {
             </div>
             <div class="col-md-4">
                 <label class="form-label small fw-bold">Total Beds</label>
-                <input type="number" name="rooms[${roomPlanCount}][beds]" class="form-control form-control-sm" required>
+                <input type="number" name="rooms[${roomPlanCount}][beds]" class="form-control form-control-sm beds-input" value="1" required>
             </div>
         </div>
     `;
     container.appendChild(newItem);
     roomPlanCount++;
+});
+
+// Auto-fill beds based on room type
+document.getElementById('roomPlansContainer').addEventListener('change', function(e) {
+    if (e.target.classList.contains('room-type-select')) {
+        const type = e.target.value;
+        const row = e.target.closest('.room-plan-item');
+        const bedsInput = row.querySelector('.beds-input');
+        
+        const bedsMap = {
+            'single': 1,
+            'double': 2,
+            'triple': 3,
+            'quad': 4
+        };
+        
+        if (bedsMap[type]) {
+            bedsInput.value = bedsMap[type];
+        }
+    }
 });
 </script>
 

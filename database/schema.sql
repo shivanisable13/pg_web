@@ -152,6 +152,13 @@ CREATE TABLE favorites (
     FOREIGN KEY (pg_id) REFERENCES pg_listings(id) ON DELETE CASCADE
 );
 
+-- System Settings Table
+CREATE TABLE settings (
+    setting_key VARCHAR(100) PRIMARY KEY,
+    setting_value TEXT,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 -- Initial Data for Amenities
 INSERT INTO amenities (name, icon_class) VALUES 
 ('WiFi', 'fa-wifi'),
@@ -162,3 +169,9 @@ INSERT INTO amenities (name, icon_class) VALUES
 ('Gym', 'fa-dumbbell'),
 ('CCTV', 'fa-video'),
 ('Power Backup', 'fa-bolt');
+
+-- Initial System Settings
+INSERT INTO settings (setting_key, setting_value) VALUES 
+('commission_percentage', '10'),
+('platform_email', 'admin@campusstay.com'),
+('allow_automatic_approval', '0');

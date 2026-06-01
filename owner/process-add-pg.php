@@ -28,10 +28,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
 
+        // Check for Automatic Approval setting
+        $auto_approval = getSetting('allow_automatic_approval', '0');
+        $status = ($auto_approval === '1') ? 'approved' : 'pending';
+
         // 1. Insert into pg_listings
-        $stmt = $pdo->prepare("INSERT INTO pg_listings (owner_id, title, description, city, area, address, pincode, university_nearby, gender_allowed, property_type, status) 
-                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')");
-        $stmt->execute([$owner_id, $title, $description, $city, $area, $address, $pincode, $university_nearby, $gender_allowed, $property_type]);
+        $stmt = $pdo->prepare("INSERT INTO pg_listings (owner_id, title, description, city, area, address, pincode, university_nearby, gender_allowed, property_type, verification_doc, status) 
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$owner_id, $title, $description, $city, $area, $address, $pincode, $university_nearby, $gender_allowed, $property_type, '', $status]);
         $pg_id = $pdo->lastInsertId();
 
         // 2. Insert into rooms
@@ -83,8 +87,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+        // 5. Handle Verification Document
+        if (isset($_FILES['verification_doc']) && $_FILES['verification_doc']['error'] === 0) {
+            $doc_url = uploadFile($_FILES['verification_doc'], 'uploads/docs/');
+            $doc_type = sanitize($_POST['document_type']);
+            if ($doc_url) {
+                $doc_stmt = $pdo->prepare("UPDATE pg_listings SET verification_doc = ?, verification_doc_type = ? WHERE id = ?");
+                $doc_stmt->execute([$doc_url, $doc_type, $pg_id]);
+            }
+        }
+
         $pdo->commit();
-        setFlash('success', 'Your PG has been submitted successfully and is pending admin approval.');
+        $message = ($status === 'approved') ? 'Your PG is now live on the platform!' : 'Your PG has been submitted successfully and is pending admin approval.';
+        setFlash('success', $message);
         redirect('/owner/manage-pgs.php');
 
     } catch (Exception $e) {

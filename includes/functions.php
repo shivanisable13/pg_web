@@ -72,19 +72,32 @@ function formatCurrency($amount) {
  * Upload Image
  */
 function uploadImage($file, $targetDir = 'uploads/pgs/') {
-    $targetFile = $targetDir . time() . '_' . basename($file["name"]);
-    $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
-    
-    // Check if image file is a actual image
-    $check = getimagesize($file["tmp_name"]);
-    if($check === false) return false;
+    return uploadFile($file, $targetDir, ['jpg', 'png', 'jpeg', 'webp'], true);
+}
+
+/**
+ * Upload File (General)
+ */
+function uploadFile($file, $targetDir = 'uploads/pgs/', $allowedExtensions = ['jpg', 'png', 'jpeg', 'webp', 'pdf'], $checkImage = false) {
+    if (!is_dir(BASE_PATH . '/' . $targetDir)) {
+        mkdir(BASE_PATH . '/' . $targetDir, 0777, true);
+    }
+
+    $extension = strtolower(pathinfo($file["name"], PATHINFO_EXTENSION));
+    $targetFile = $targetDir . time() . '_' . bin2hex(random_bytes(4)) . '.' . $extension;
     
     // Check file size (5MB limit)
     if ($file["size"] > 5000000) return false;
     
     // Allow certain file formats
-    if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "webp") {
+    if(!in_array($extension, $allowedExtensions)) {
         return false;
+    }
+
+    // Optional image check
+    if ($checkImage) {
+        $check = @getimagesize($file["tmp_name"]);
+        if($check === false) return false;
     }
     
     if (move_uploaded_file($file["tmp_name"], BASE_PATH . '/' . $targetFile)) {
@@ -131,7 +144,7 @@ function isFavorited($user_id, $pg_id) {
     global $pdo;
     if (empty($user_id) || empty($pg_id)) return false;
     try {
-        $stmt = $pdo->prepare("SELECT id FROM favorites WHERE user_id = ? AND pg_id = ?");
+        $stmt = $pdo->prepare("SELECT 1 FROM favorites WHERE user_id = ? AND pg_id = ?");
         $stmt->execute([$user_id, $pg_id]);
         return (bool) $stmt->fetch();
     } catch (Exception $e) {
