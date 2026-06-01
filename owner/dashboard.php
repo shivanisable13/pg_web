@@ -26,6 +26,17 @@ $active_bookings = $active_bookings->fetchColumn();
 $total_revenue = $pdo->prepare("SELECT SUM(amount) FROM payments pay JOIN bookings b ON pay.booking_id = b.id JOIN pg_listings p ON b.pg_id = p.id WHERE p.owner_id = ? AND pay.payment_status = 'captured'");
 $total_revenue->execute([$owner_id]);
 $total_revenue = $total_revenue->fetchColumn() ?? 0;
+
+// Fetch owner payment config status
+$stmt = $pdo->prepare("SELECT payment_upi_id, payment_account_number FROM users WHERE id = ?");
+$stmt->execute([$owner_id]);
+$owner_details = $stmt->fetch();
+$payment_setup_missing = empty($owner_details['payment_upi_id']) && empty($owner_details['payment_account_number']);
+
+// Fetch recent notifications
+$stmt = $pdo->prepare("SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 3");
+$stmt->execute([$owner_id]);
+$recent_notifications = $stmt->fetchAll();
 ?>
 
 <div class="container py-4">
@@ -45,6 +56,7 @@ $total_revenue = $total_revenue->fetchColumn() ?? 0;
                     <a href="add-pg.php" class="sidebar-link text-primary fw-bold"><i class="fa-solid fa-plus-circle"></i> Add New PG</a>
                     <a href="bookings.php" class="sidebar-link"><i class="fa-solid fa-calendar-check"></i> Bookings</a>
                     <a href="revenue.php" class="sidebar-link"><i class="fa-solid fa-indian-rupee-sign"></i> Revenue</a>
+                    <a href="notifications.php" class="sidebar-link"><i class="fa-solid fa-bell"></i> Notifications</a>
                     <a href="profile.php" class="sidebar-link"><i class="fa-solid fa-user-gear"></i> Settings</a>
                     <a href="../auth/logout.php" class="sidebar-link text-danger"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
                 </nav>
@@ -57,6 +69,18 @@ $total_revenue = $total_revenue->fetchColumn() ?? 0;
                 <h2 class="fw-bold mb-0">Dashboard Overview</h2>
                 <a href="add-pg.php" class="btn btn-primary rounded-pill"><i class="fa-solid fa-plus me-2"></i> List New Property</a>
             </div>
+
+            <?php if ($payment_setup_missing): ?>
+            <div class="alert alert-warning border-0 shadow-sm rounded-4 p-4 mb-4 d-flex align-items-center gap-3">
+                <div class="icon-box bg-warning-light text-warning flex-shrink-0" style="width: 50px; height: 50px; border-radius: 12px;">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-1">Set Up Your Payment Details</h6>
+                    <p class="small mb-0 text-secondary">You haven't configured your UPI ID or Bank Account settings yet. Students won't be able to pay you directly on checkout. <a href="profile.php" class="fw-bold text-dark text-decoration-underline">Set Up Now</a></p>
+                </div>
+            </div>
+            <?php endif; ?>
 
             <!-- Stats Cards -->
             <div class="row g-4 mb-4">
