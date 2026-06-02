@@ -24,6 +24,7 @@ $active_bookings->execute([$owner_id]);
 $active_bookings = $active_bookings->fetchColumn();
 
 $total_revenue = $pdo->prepare("SELECT SUM(amount) FROM payments pay JOIN bookings b ON pay.booking_id = b.id JOIN pg_listings p ON b.pg_id = p.id WHERE p.owner_id = ? AND pay.payment_status = 'captured'");
+$total_revenue = $pdo->prepare("SELECT SUM(CASE WHEN pay.owner_amount > 0 THEN pay.owner_amount ELSE pay.amount END) FROM payments pay JOIN bookings b ON pay.booking_id = b.id JOIN pg_listings p ON b.pg_id = p.id WHERE p.owner_id = ? AND pay.payment_status = 'captured'");
 $total_revenue->execute([$owner_id]);
 $total_revenue = $total_revenue->fetchColumn() ?? 0;
 
