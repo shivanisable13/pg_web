@@ -77,13 +77,19 @@ try {
         setFlash('warning', 'This booking was already confirmed.');
         redirect('/user/booking-details.php?id=' . $booking_id);
     }
+    // Fetch commission percentage from settings
+    $comm_stmt = $pdo->query("SELECT setting_value FROM settings WHERE setting_key = 'commission_percentage'");
+    $comm_percentage = (float)($comm_stmt->fetchColumn() ?: 10);
+    // Calculate split amounts
+    $total_amount = (float)$booking['total_amount'];
+    $commission_amount = ($total_amount * $comm_percentage) / 100;
+    $owner_amount = $total_amount - $commission_amount;
     // Update booking status
     $pdo->prepare("UPDATE bookings SET status = 'confirmed', payment_status = 'paid' WHERE id = ?")
         ->execute([$booking_id]);
     // Insert payment record
-    $pdo->prepare("INSERT INTO payments (booking_id, transaction_id, amount, payment_method, payment_status) VALUES (?, ?, ?, 'Razorpay', 'captured')")
-        ->execute([$booking_id, $razorpay_payment_id, $booking['total_amount']]);
     $pdo->prepare("INSERT INTO payments (booking_id, user_id, pg_id, owner_id, razorpay_order_id, razorpay_payment_id, transaction_id, amount, payment_method, payment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Razorpay', 'captured')")
+    $pdo->prepare("INSERT INTO payments (booking_id, user_id, pg_id, owner_id, razorpay_order_id, razorpay_payment_id, transaction_id, amount, commission_amount, owner_amount, payment_method, payment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Razorpay', 'captured')")
         ->execute([
             $booking_id,
             $booking['user_id'],
@@ -93,6 +99,9 @@ try {
             $razorpay_payment_id,
             $razorpay_payment_id,
             $booking['total_amount']
+            $total_amount,
+            $commission_amount,
+            $owner_amount
         ]);
     // Reduce available beds
     $pdo->prepare("UPDATE rooms SET available_beds = available_beds - 1 WHERE id = ? AND available_beds > 0")
@@ -102,7 +111,11 @@ try {
         ->execute([$booking['user_id']]);
     // Notify owner with full details
     $owner_msg = "New booking confirmed! {$booking['user_name']} has paid ₹" . number_format($booking['total_amount']) .
+    // Notify owner with full details (including commission split)
+    $owner_msg = "New booking confirmed! {$booking['user_name']} has paid ₹" . number_format($total_amount) . 
                  " for a " . ucfirst($booking['room_type']) . " Sharing room at '{$booking['pg_title']}'. " .
+                 "Admin Commission ({$comm_percentage}%): ₹" . number_format($commission_amount) . ". " .
+                 "Your Earnings: ₹" . number_format($owner_amount) . ". " .
                  "Razorpay Payment ID: {$razorpay_payment_id}.";
     $pdo->prepare("INSERT INTO notifications (user_id, title, message, type) VALUES (?, 'Payment Received ✓', ?, 'info')")
         ->execute([$booking['owner_id'], $owner_msg]);
