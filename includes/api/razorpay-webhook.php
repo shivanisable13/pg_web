@@ -85,13 +85,19 @@ if ($data['event'] === 'payment.captured') {
             echo json_encode(['status' => 'success', 'message' => 'Booking already processed']);
             exit;
         }
+        // Fetch commission percentage from settings
+        $comm_stmt = $pdo->query("SELECT setting_value FROM settings WHERE setting_key = 'commission_percentage'");
+        $comm_percentage = (float)($comm_stmt->fetchColumn() ?: 10);
+        // Calculate split amounts
+        $total_amount = (float)$amount_in_rupees;
+        $commission_amount = ($total_amount * $comm_percentage) / 100;
+        $owner_amount = $total_amount - $commission_amount;
         // Update booking status
         $pdo->prepare("UPDATE bookings SET status = 'confirmed', payment_status = 'paid' WHERE id = ?")
             ->execute([$booking['id']]);
         // Insert payment record
-        $pdo->prepare("INSERT INTO payments (booking_id, transaction_id, amount, payment_method, payment_status) VALUES (?, ?, ?, 'Razorpay (Webhook)', 'captured')")
-            ->execute([$booking['id'], $razorpay_payment_id, $amount_in_rupees]);
         $pdo->prepare("INSERT INTO payments (booking_id, user_id, pg_id, owner_id, razorpay_order_id, razorpay_payment_id, transaction_id, amount, payment_method, payment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Razorpay (Webhook)', 'captured')")
+        $pdo->prepare("INSERT INTO payments (booking_id, user_id, pg_id, owner_id, razorpay_order_id, razorpay_payment_id, transaction_id, amount, commission_amount, owner_amount, payment_method, payment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Razorpay (Webhook)', 'captured')")
             ->execute([
                 $booking['id'],
                 $booking['user_id'],
@@ -101,6 +107,9 @@ if ($data['event'] === 'payment.captured') {
                 $razorpay_payment_id,
                 $razorpay_payment_id,
                 $amount_in_rupees
+                $total_amount,
+                $commission_amount,
+                $owner_amount
             ]);
         // Reduce available beds
         $pdo->prepare("UPDATE rooms SET available_beds = available_beds - 1 WHERE id = ? AND available_beds > 0")
@@ -110,7 +119,11 @@ if ($data['event'] === 'payment.captured') {
             ->execute([$booking['user_id']]);
         // Notify owner
         $owner_msg = "New booking confirmed! (Auto-verified) {$booking['user_name']} has paid ₹" . number_format($amount_in_rupees) .
+        // Notify owner (including commission split)
+        $owner_msg = "New booking confirmed! (Auto-verified) {$booking['user_name']} has paid ₹" . number_format($total_amount) .
                      " for a " . ucfirst($booking['room_type']) . " Sharing room at '{$booking['pg_title']}'. " .
+                     "Admin Commission ({$comm_percentage}%): ₹" . number_format($commission_amount) . ". " .
+                     "Your Earnings: ₹" . number_format($owner_amount) . ". " .
                      "Payment ID: {$razorpay_payment_id}.";
         $pdo->prepare("INSERT INTO notifications (user_id, title, message, type) VALUES (?, 'Payment Received ✓', ?, 'info')")
             ->execute([$booking['owner_id'], $owner_msg]);
