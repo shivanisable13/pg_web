@@ -8,23 +8,12 @@ if (!isLoggedIn() || !hasRole('admin')) redirect('/auth/login.php');
 
 // Handle Settings Update
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $commission = sanitize($_POST['commission_percent']);
-    $token = sanitize($_POST['booking_token']);
-    $auto_approval = isset($_POST['auto_approval']) ? '1' : '0';
     $maintenance = isset($_POST['maintenance_mode']) ? '1' : '0';
-
-    updateSetting('commission_percentage', $commission);
-    updateSetting('booking_token', $token);
-    updateSetting('allow_automatic_approval', $auto_approval);
     updateSetting('maintenance_mode', $maintenance);
-
     setFlash('success', 'System settings updated successfully.');
 }
 
 // Fetch Current Settings
-$commission = getSetting('commission_percentage', '10');
-$token = getSetting('booking_token', '500');
-$auto_approval = getSetting('allow_automatic_approval', '0');
 $maintenance = getSetting('maintenance_mode', '0');
 
 require_once '../includes/header.php';
@@ -44,37 +33,7 @@ require_once '../includes/header.php';
         <div class="row g-4">
             <div class="col-md-6">
                 <div class="glass-card p-4 h-100">
-                    <h5 class="fw-bold mb-4">Platform Configuration</h5>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Platform Commission (%)</label>
-                        <div class="input-group">
-                            <input type="number" name="commission_percent" class="form-control rounded-pill-start" value="<?php echo $commission; ?>" required>
-                            <span class="input-group-text rounded-pill-end">%</span>
-                        </div>
-                        <div class="form-text">Percentage taken from each booking.</div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Default Booking Token (₹)</label>
-                        <div class="input-group">
-                            <span class="input-group-text rounded-pill-start">₹</span>
-                            <input type="number" name="booking_token" class="form-control rounded-pill-end" value="<?php echo $token; ?>" required>
-                        </div>
-                        <div class="form-text">Initial amount to be paid by student.</div>
-                    </div>
-                    <div class="mb-3">
-                        <div class="form-check form-switch p-0 ps-5">
-                            <input class="form-check-input" type="checkbox" name="auto_approval" id="autoApproval" <?php echo $auto_approval === '1' ? 'checked' : ''; ?>>
-                            <label class="form-check-label small fw-bold" for="autoApproval" id="autoApprovalLabel">
-                                <?php echo $auto_approval === '1' ? 'Enable Automatic PG Approval' : 'Enable Automatic PG Approval'; ?>
-                            </label>
-                        </div>
-                        <div class="form-text ps-5">If enabled, PG listings will be live immediately without review.</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="glass-card p-4 h-100">
-                    <h5 class="fw-bold mb-4">Security & API</h5>
+                    <h5 class="fw-bold mb-4">Security &amp; API</h5>
                     <div class="mb-4">
                         <label class="form-label small fw-bold">Maintenance Mode</label>
                         <div class="form-check form-switch p-0 ps-5">
