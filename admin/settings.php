@@ -47,6 +47,7 @@ require_once '../includes/header.php';
                 </div>
             </div>
             <div class="col-12 mt-4 text-end">
+            <div class="col-12 mt-4 text-start">
                 <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 fw-bold shadow">
                     <i class="fa-solid fa-save me-2"></i> Save All Settings
                 </button>
