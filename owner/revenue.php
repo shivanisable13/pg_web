@@ -12,14 +12,11 @@ $owner_id = $_SESSION['user_id'];
 
 // Fetch Total Revenue
 $stmt = $pdo->prepare("SELECT SUM(amount) as total_revenue FROM payments p JOIN bookings b ON p.booking_id = b.id JOIN pg_listings pg ON b.pg_id = pg.id WHERE pg.owner_id = ? AND p.payment_status = 'captured'");
-// Fetch Total Revenue (actual owner earnings after commission)
-$stmt = $pdo->prepare("SELECT SUM(CASE WHEN p.owner_amount > 0 THEN p.owner_amount ELSE p.amount END) as total_revenue FROM payments p JOIN bookings b ON p.booking_id = b.id JOIN pg_listings pg ON b.pg_id = pg.id WHERE pg.owner_id = ? AND p.payment_status = 'captured'");
 $stmt->execute([$owner_id]);
 $total_revenue = $stmt->fetchColumn() ?: 0;
 
 // Fetch Monthly Breakdown (Last 6 Months)
 $stmt = $pdo->prepare("SELECT DATE_FORMAT(p.created_at, '%b %Y') as month, SUM(p.amount) as revenue 
-$stmt = $pdo->prepare("SELECT DATE_FORMAT(p.created_at, '%b %Y') as month, SUM(CASE WHEN p.owner_amount > 0 THEN p.owner_amount ELSE p.amount END) as revenue 
                       FROM payments p 
                       JOIN bookings b ON p.booking_id = b.id 
                       JOIN pg_listings pg ON b.pg_id = pg.id 
@@ -71,9 +68,6 @@ $monthly_data = $stmt->fetchAll();
                                 <th>Student</th>
                                 <th>PG Title</th>
                                 <th>Amount</th>
-                                <th>Total Paid</th>
-                                <th>Admin Commission</th>
-                                <th>Your Payout</th>
                                 <th>Transaction ID</th>
                             </tr>
                         </thead>
@@ -90,18 +84,11 @@ $monthly_data = $stmt->fetchAll();
                             $transactions = $stmt->fetchAll();
                             
                             foreach ($transactions as $t): ?>
-                            foreach ($transactions as $t): 
-                                $comm = $t['commission_amount'] > 0 ? $t['commission_amount'] : ($t['amount'] * 0.10); // fallback to 10%
-                                $payout = $t['owner_amount'] > 0 ? $t['owner_amount'] : ($t['amount'] - $comm);
-                            ?>
                             <tr>
                                 <td class="ps-3 small"><?php echo date('d M, Y', strtotime($t['created_at'])); ?></td>
                                 <td><?php echo $t['student_name']; ?></td>
                                 <td><?php echo $t['pg_title']; ?></td>
                                 <td class="fw-bold">₹<?php echo number_format($t['amount']); ?></td>
-                                <td class="text-muted">₹<?php echo number_format($t['amount'], 2); ?></td>
-                                <td class="text-danger">-₹<?php echo number_format($comm, 2); ?></td>
-                                <td class="fw-bold text-success">₹<?php echo number_format($payout, 2); ?></td>
                                 <td><code class="text-primary"><?php echo $t['transaction_id']; ?></code></td>
                             </tr>
                             <?php endforeach; ?>
