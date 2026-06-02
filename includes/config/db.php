@@ -62,6 +62,17 @@ try {
     } catch (Exception $schema_pay_e) {
         // Suppress errors if payments table doesn't exist yet
     }
+    // Auto-migration: Add commission_amount and owner_amount to payments table
+    try {
+        $check_comm = $pdo->query("SHOW COLUMNS FROM payments LIKE 'commission_amount'");
+        if ($check_comm->rowCount() == 0) {
+            $pdo->exec("ALTER TABLE payments 
+                        ADD COLUMN commission_amount DECIMAL(10,2) DEFAULT 0.00 AFTER amount,
+                        ADD COLUMN owner_amount DECIMAL(10,2) DEFAULT 0.00 AFTER commission_amount");
+        }
+    } catch (Exception $schema_comm_e) {
+        // Suppress errors
+    }
 } catch (PDOException $e) {
     die("Connection failed: " . $e->getMessage());
 }
