@@ -38,6 +38,30 @@ try {
     } catch (Exception $schema_users_e) {
         // Suppress errors if users table doesn't exist during initial setup
     }
+    // Auto-migration: Add razorpay_order_id to bookings (for secure payment verification)
+    try {
+        $check_order = $pdo->query("SHOW COLUMNS FROM bookings LIKE 'razorpay_order_id'");
+        if ($check_order->rowCount() == 0) {
+            $pdo->exec("ALTER TABLE bookings 
+                        ADD COLUMN razorpay_order_id VARCHAR(100) NULL AFTER payment_status");
+        }
+    } catch (Exception $schema_order_e) {
+        // Suppress errors if bookings table doesn't exist yet
+    }
+    // Auto-migration: Add detailed payment tracking columns to payments table
+    try {
+        $check_pay_cols = $pdo->query("SHOW COLUMNS FROM payments LIKE 'user_id'");
+        if ($check_pay_cols->rowCount() == 0) {
+            $pdo->exec("ALTER TABLE payments 
+                        ADD COLUMN user_id INT NULL,
+                        ADD COLUMN pg_id INT NULL,
+                        ADD COLUMN owner_id INT NULL,
+                        ADD COLUMN razorpay_order_id VARCHAR(100) NULL,
+                        ADD COLUMN razorpay_payment_id VARCHAR(100) NULL");
+        }
+    } catch (Exception $schema_pay_e) {
+        // Suppress errors if payments table doesn't exist yet
+    }
 } catch (PDOException $e) {
     die("Connection failed: " . $e->getMessage());
 }
