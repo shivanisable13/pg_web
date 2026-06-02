@@ -2,16 +2,12 @@
 $pageTitle = "Booking Details";
 require_once '../includes/config/config.php';
 require_once '../includes/functions.php';
-
 if (!isLoggedIn() || !hasRole('student')) {
     redirect('/auth/login.php');
 }
-
 require_once '../includes/header.php';
 require_once '../includes/config/db.php';
-
 $booking_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-
 // Fetch Detailed Booking Info
 $stmt = $pdo->prepare("SELECT b.*, p.title as pg_title, p.address, p.city, p.area, r.room_type, r.rent_per_month, u.full_name as owner_name, u.phone as owner_phone
                       FROM bookings b 
@@ -21,18 +17,20 @@ $stmt = $pdo->prepare("SELECT b.*, p.title as pg_title, p.address, p.city, p.are
                       WHERE b.id = ? AND b.user_id = ?");
 $stmt->execute([$booking_id, $_SESSION['user_id']]);
 $booking = $stmt->fetch();
-
 if (!$booking) {
     setFlash('danger', 'Booking details not found.');
     redirect('bookings.php');
 }
-
 if (!$booking) {
     setFlash('danger', 'Booking details not found.');
     redirect('bookings.php');
+$payment = null;
+if ($booking['payment_status'] === 'paid') {
+    $payStmt = $pdo->prepare("SELECT * FROM payments WHERE booking_id = ? ORDER BY created_at DESC LIMIT 1");
+    $payStmt->execute([$booking_id]);
+    $payment = $payStmt->fetch();
 }
 ?>
-
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
@@ -42,7 +40,6 @@ if (!$booking) {
                     <h2 class="fw-bold mb-0">Booking Details</h2>
                 </div>
             </div>
-
             <div class="glass-card overflow-hidden">
                 <!-- Header Status -->
                 <div class="p-4 <?php echo $booking['payment_status'] === 'paid' ? 'bg-success text-white' : 'bg-warning text-dark'; ?> d-flex justify-content-between align-items-center">
@@ -55,7 +52,6 @@ if (!$booking) {
                         <h5 class="fw-bold mb-0 text-uppercase"><?php echo $booking['payment_status']; ?></h5>
                     </div>
                 </div>
-
                 <div class="p-4 p-md-5">
                     <div class="row g-4">
                         <!-- Property Info -->
@@ -101,7 +97,6 @@ if (!$booking) {
                                 </div>
                             </div>
                         </div>
-
                         <!-- Owner & Payment -->
                         <div class="col-md-6">
                             <div class="bg-light rounded-4 p-4">
@@ -119,7 +114,6 @@ if (!$booking) {
                                     <span class="h5 fw-bold mb-0 text-primary">₹<?php echo $booking['payment_status'] === 'paid' ? number_format($booking['total_amount']) : '0.00'; ?></span>
                                 </div>
                             </div>
-
                             <div class="mt-4 p-3 border rounded-4 d-flex align-items-center gap-3">
                                 <div class="icon-box bg-primary-light text-primary" style="width: 50px; height: 50px;">
                                     <i class="fa-solid fa-user"></i>
@@ -132,9 +126,31 @@ if (!$booking) {
                                     <i class="fa-solid fa-phone"></i>
                                 </a>
                             </div>
+                            <?php if ($payment): ?>
+                            <div class="mt-4 bg-light rounded-4 p-4 border border-success border-opacity-25">
+                                <h6 class="text-success text-uppercase small fw-bold mb-3"><i class="fa-solid fa-file-invoice-dollar me-2"></i>Payment Receipt Details</h6>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted small">Payment Method</span>
+                                    <span class="fw-bold small"><?php echo htmlspecialchars($payment['payment_method']); ?></span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted small">Transaction/Payment ID</span>
+                                    <span class="fw-semibold small text-primary"><code><?php echo htmlspecialchars($payment['transaction_id']); ?></code></span>
+                                </div>
+                                <?php if (!empty($payment['razorpay_order_id'])): ?>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted small">Razorpay Order ID</span>
+                                    <span class="fw-semibold small"><code><?php echo htmlspecialchars($payment['razorpay_order_id']); ?></code></span>
+                                </div>
+                                <?php endif; ?>
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted small">Paid On</span>
+                                    <span class="fw-semibold small"><?php echo date('d M, Y h:i A', strtotime($payment['created_at'])); ?></span>
+                                </div>
+                            </div>
+                            <?php endif; ?>
                         </div>
                     </div>
-
                     <?php if($booking['payment_status'] !== 'paid'): ?>
                         <div class="mt-5 text-center">
                             <a href="../checkout.php?booking_id=<?php echo $booking['id']; ?>" class="btn btn-primary px-5 py-3 rounded-pill fw-bold">
@@ -151,7 +167,6 @@ if (!$booking) {
         </div>
     </div>
 </div>
-
 <style>
 @media print {
     /* Hide non-receipt elements */
@@ -206,5 +221,4 @@ if (!$booking) {
     }
 }
 </style>
-
 <?php require_once '../includes/footer.php'; ?>
