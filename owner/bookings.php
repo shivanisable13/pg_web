@@ -50,9 +50,6 @@ $bookings = $stmt->fetchAll();
                                 <th class="ps-4">Student</th>
                                 <th>PG / Room</th>
                                 <th>Move-in Date</th>
-                                <th>Booking / Move-in Date</th>
-                                <th>Amount</th>
-                                <th>Payment Status</th>
                                 <th class="text-end pe-4">Status</th>
                             </tr>
                         </thead>
@@ -60,7 +57,6 @@ $bookings = $stmt->fetchAll();
                             <?php if (empty($bookings)): ?>
                             <tr>
                                 <td colspan="4" class="text-center py-5 text-muted">No bookings found.</td>
-                                <td colspan="8" class="text-center py-5 text-muted">No bookings found.</td>
                             </tr>
                             <?php else: ?>
                                 <?php foreach ($bookings as $b): ?>
@@ -75,28 +71,6 @@ $bookings = $stmt->fetchAll();
                                     </td>
                                     <td><?php echo date('d M, Y', strtotime($b['move_in_date'])); ?></td>
                                     <td>
-                                        <div class="small fw-semibold">Booked: <?php echo date('d M, Y', strtotime($b['booking_date'])); ?></div>
-                                        <div class="small text-muted">Move-in: <?php echo date('d M, Y', strtotime($b['move_in_date'])); ?></div>
-                                    </td>
-                                    <td>
-                                        <span class="fw-bold text-dark">₹<?php echo number_format($b['total_amount'], 2); ?></span>
-                                    </td>
-                                    <td>
-                                        <?php 
-                                        $payClass = 'bg-warning-light text-warning';
-                                        if ($b['payment_status'] === 'paid') $payClass = 'bg-success-light text-success';
-                                        if ($b['payment_status'] === 'refunded') $payClass = 'bg-danger-light text-danger';
-                                        ?>
-                                        <span class="badge <?php echo $payClass; ?> px-2 py-1 small rounded-3">
-                                            <?php echo ucfirst($b['payment_status']); ?>
-                                        </span>
-                                        <?php if ($b['transaction_id']): ?>
-                                            <div class="mt-1" style="font-size: 11px;">
-                                                <code class="text-muted" title="Payment ID"><?php echo $b['transaction_id']; ?></code>
-                                            </div>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td class="text-end pe-4">
                                         <?php 
                                         $statusClass = 'bg-warning-light text-warning';
                                         if ($b['status'] === 'confirmed') $statusClass = 'bg-success-light text-success';
