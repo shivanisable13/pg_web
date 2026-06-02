@@ -36,14 +36,31 @@ try {
         setFlash('warning', 'This booking has already been processed.');
         redirect('/user/bookings.php');
     }
+    // Fetch commission percentage from settings
+    $comm_stmt = $pdo->query("SELECT setting_value FROM settings WHERE setting_key = 'commission_percentage'");
+    $comm_percentage = (float)($comm_stmt->fetchColumn() ?: 10);
+    // Calculate splits
+    $total_amount = (float)$booking['total_amount'];
+    $commission_amount = ($total_amount * $comm_percentage) / 100;
+    $owner_amount = $total_amount - $commission_amount;
     // 2. Update Booking Status
     $stmt = $pdo->prepare("UPDATE bookings SET status = 'confirmed', payment_status = 'paid' WHERE id = ?");
     $stmt->execute([$booking_id]);
     // 3. Insert Payment Record
-    $stmt = $pdo->prepare("INSERT INTO payments (booking_id, transaction_id, amount, payment_method, payment_status) VALUES (?, ?, ?, 'Direct Transfer', 'captured')");
-    $stmt->execute([$booking_id, $transaction_id, $booking['total_amount']]);
     $stmt = $pdo->prepare("INSERT INTO payments (booking_id, user_id, pg_id, owner_id, razorpay_order_id, razorpay_payment_id, transaction_id, amount, payment_method, payment_status) VALUES (?, ?, ?, ?, NULL, NULL, ?, ?, 'Direct Transfer', 'captured')");
     $stmt->execute([$booking_id, $booking['user_id'], $booking['pg_id'], $booking['owner_id'], $transaction_id, $booking['total_amount']]);
+    // 3. Insert Payment Record (with commission splits)
+    $stmt = $pdo->prepare("INSERT INTO payments (booking_id, user_id, pg_id, owner_id, razorpay_order_id, razorpay_payment_id, transaction_id, amount, commission_amount, owner_amount, payment_method, payment_status) VALUES (?, ?, ?, ?, NULL, NULL, ?, ?, ?, ?, 'Direct Transfer', 'captured')");
+    $stmt->execute([
+        $booking_id, 
+        $booking['user_id'], 
+        $booking['pg_id'], 
+        $booking['owner_id'], 
+        $transaction_id, 
+        $total_amount,
+        $commission_amount,
+        $owner_amount
+    ]);
     // 4. Reduce Room Bed Availability
     $stmt = $pdo->prepare("UPDATE rooms SET available_beds = available_beds - 1 WHERE id = ?");
     $stmt->execute([$booking['room_id']]);
@@ -52,6 +69,12 @@ try {
     $stmt->execute([$booking['user_id']]);
     // 6. Create System Notification for Owner
     $ownerMessage = "User {$booking['user_name']} has booked a room (" . ucfirst($booking['room_type']) . " Sharing) in your PG '{$booking['pg_title']}'. A payment of ₹" . number_format($booking['total_amount']) . " was made directly to your account. Transaction ID: $transaction_id.";
+    // 6. Create System Notification for Owner (with commission split layout)
+    $ownerMessage = "User {$booking['user_name']} has booked a room (" . ucfirst($booking['room_type']) . " Sharing) in your PG '{$booking['pg_title']}'. " .
+                   "A direct payment of ₹" . number_format($total_amount) . " was made. " .
+                   "Admin Commission ({$comm_percentage}%): ₹" . number_format($commission_amount) . ". " .
+                   "Your Payout: ₹" . number_format($owner_amount) . ". " .
+                   "Transaction ID: $transaction_id.";
     $stmt = $pdo->prepare("INSERT INTO notifications (user_id, title, message, type) VALUES (?, 'New Booking & Payment Received', ?, 'info')");
     $stmt->execute([$booking['owner_id'], $ownerMessage]);
     $pdo->commit();
@@ -120,3 +143,4 @@ try {
     redirect('/index.php');
 }
 ?>
+
