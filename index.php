@@ -24,7 +24,7 @@ $stmt = $pdo->query("
 $featuredPGs = $stmt->fetchAll();
 ?>
 
-
+< !--Hero Section-- >
 <section class="hero-section">
     <div class="container">
         <div class="row align-items-center">
