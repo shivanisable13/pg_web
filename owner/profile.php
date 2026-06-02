@@ -2,14 +2,18 @@
 $pageTitle = "Account Settings";
 require_once '../includes/config/config.php';
 require_once '../includes/functions.php';
+
 if (!isLoggedIn() || !hasRole('owner')) redirect('/auth/login.php');
+
 require_once '../includes/header.php';
 require_once '../includes/config/db.php';
+
 $user_id = $_SESSION['user_id'];
 $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch();
 ?>
+
 <div class="container py-4">
     <div class="row g-4">
         <!-- Sidebar -->
@@ -24,9 +28,11 @@ $user = $stmt->fetch();
                 </nav>
             </div>
         </div>
+
         <!-- Main Content -->
         <div class="col-lg-9">
             <h2 class="fw-bold mb-4">Account Settings</h2>
+
             <div class="glass-card p-4">
                 <form action="process-profile.php" method="POST" enctype="multipart/form-data">
                     <div class="row g-4">
@@ -53,28 +59,6 @@ $user = $stmt->fetch();
                             
                             <hr class="my-4">
                             
-                            <h5 class="fw-bold mb-3"><i class="fa-solid fa-wallet text-primary me-2"></i>Payment Details</h5>
-                            <p class="text-muted small mb-3">Provide payment information so students can pay you directly for bookings.</p>
-                            <div class="row g-3 mb-4">
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">UPI ID</label>
-                                    <input type="text" name="payment_upi_id" class="form-control" value="<?php echo htmlspecialchars($user['payment_upi_id'] ?? ''); ?>" placeholder="e.g. ownername@upi">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Bank Name</label>
-                                    <input type="text" name="payment_bank_name" class="form-control" value="<?php echo htmlspecialchars($user['payment_bank_name'] ?? ''); ?>" placeholder="e.g. State Bank of India">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Bank Account Number</label>
-                                    <input type="text" name="payment_account_number" class="form-control" value="<?php echo htmlspecialchars($user['payment_account_number'] ?? ''); ?>" placeholder="e.g. 10023456789">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">IFSC Code</label>
-                                    <input type="text" name="payment_ifsc_code" class="form-control" value="<?php echo htmlspecialchars($user['payment_ifsc_code'] ?? ''); ?>" placeholder="e.g. SBIN0001234">
-                                </div>
-                            </div>
-                            <hr class="my-4">
-                            
                             <h5 class="fw-bold mb-3">Security</h5>
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">New Password</label>
@@ -89,4 +73,5 @@ $user = $stmt->fetch();
         </div>
     </div>
 </div>
+
 <?php require_once '../includes/footer.php'; ?>
