@@ -42,6 +42,8 @@ try {
     // 3. Insert Payment Record
     $stmt = $pdo->prepare("INSERT INTO payments (booking_id, transaction_id, amount, payment_method, payment_status) VALUES (?, ?, ?, 'Direct Transfer', 'captured')");
     $stmt->execute([$booking_id, $transaction_id, $booking['total_amount']]);
+    $stmt = $pdo->prepare("INSERT INTO payments (booking_id, user_id, pg_id, owner_id, razorpay_order_id, razorpay_payment_id, transaction_id, amount, payment_method, payment_status) VALUES (?, ?, ?, ?, NULL, NULL, ?, ?, 'Direct Transfer', 'captured')");
+    $stmt->execute([$booking_id, $booking['user_id'], $booking['pg_id'], $booking['owner_id'], $transaction_id, $booking['total_amount']]);
     // 4. Reduce Room Bed Availability
     $stmt = $pdo->prepare("UPDATE rooms SET available_beds = available_beds - 1 WHERE id = ?");
     $stmt->execute([$booking['room_id']]);
