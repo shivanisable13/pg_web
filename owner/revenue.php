@@ -65,7 +65,7 @@ $monthly_data = $stmt->fetchAll();
                         <thead class="bg-light">
                             <tr>
                                 <th class="ps-3">Date</th>
-                                <th>Student</th>
+                                <th>Users</th>
                                 <th>PG Title</th>
                                 <th>Amount</th>
                                 <th>Transaction ID</th>
