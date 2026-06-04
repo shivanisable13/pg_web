@@ -36,7 +36,7 @@ $notifications = $stmt->fetchAll();
                 <div class="text-center mb-4">
                     <img src="<?php echo APP_URL . '/' . $_SESSION['user_image']; ?>" class="rounded-circle border mb-3" width="80" height="80" alt="Profile">
                     <h5 class="fw-bold mb-0"><?php echo $_SESSION['user_name']; ?></h5>
-                    <p class="text-muted small">Student</p>
+                    <p class="text-muted small">User</p>
                 </div>
                 <hr>
                 <nav class="nav flex-column gap-2">
