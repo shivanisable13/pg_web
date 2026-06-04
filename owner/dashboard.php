@@ -78,7 +78,7 @@ $total_revenue = $total_revenue->fetchColumn() ?? 0;
                                 <i class="fa-solid fa-user-check fa-2x"></i>
                             </div>
                             <h3 class="fw-bold mb-1"><?php echo $active_bookings; ?></h3>
-                            <p class="text-muted mb-0">Active Tenants</p>
+                            <p class="text-muted mb-0">Active Users</p>
                         </div>
                     </a>
                 </div>
