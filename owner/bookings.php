@@ -47,7 +47,7 @@ $bookings = $stmt->fetchAll();
                     <table class="table table-hover align-middle mb-0">
                         <thead class="bg-light">
                             <tr>
-                                <th class="ps-4">Student</th>
+                                <th class="ps-4">User</th>
                                 <th>PG / Room</th>
                                 <th>Move-in Date</th>
                                 <th class="text-end pe-4">Status</th>
