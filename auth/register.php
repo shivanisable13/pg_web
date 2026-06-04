@@ -74,7 +74,7 @@ require_once '../includes/header.php';
                         <label class="form-label fw-semibold">I am a...</label>
                         <div class="row g-2">
                             <div class="col-6">
-                                <input type="radio" class="btn-check" name="role" id="role-student" value="student" checked>
+                                <input type="radio" class="btn-check" name="role" id="role-student" value="User" checked>
                                 <label class="btn btn-outline-primary w-100 py-3 rounded-4" for="role-student">
                                     <i class="fa-solid fa-graduation-cap d-block mb-2 fs-4"></i>
                                     Student
