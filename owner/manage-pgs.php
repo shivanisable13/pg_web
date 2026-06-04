@@ -83,7 +83,7 @@ $pgs = $stmt->fetchAll();
                                 </div>
                                 <div class="col-md-2 text-center">
                                     <h6 class="fw-bold mb-0"><?php echo $pg['active_tenants']; ?></h6>
-                                    <span class="small text-muted">Tenants</span>
+                                    <span class="small text-muted">Users</span>
                                 </div>
                                 <div class="col-md-2 text-end">
                                     <div class="dropdown">
