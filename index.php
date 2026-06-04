@@ -40,7 +40,7 @@ $featuredPGs = $stmt->fetchAll();
                 </h1>
 
                 <p class="lead text-secondary mt-4 mb-5">
-                    Verified PGs and Student Accommodations in top cities.
+                    Verified PGs and User Accommodations in cities.
                     Safe, comfortable, and affordable.
                 </p>
 
